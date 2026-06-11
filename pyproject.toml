@@ -1,0 +1,32 @@
+# █▀█ █▀█ █▀█ ░░█ █▀▀ █▀▀ ▀█▀   █▀▄ █▀▀ ▀█▀ ▄▀█ █ █░░ █▀
+# █▀▀ █▀▄ █▄█ █▄█ ██▄ █▄▄ ░█░   █▄▀ ██▄ ░█░ █▀█ █ █▄▄ ▄█
+# ======================================================
+
+[project]
+name = "anisodactyl"
+version = "0.0.1"
+authors = [ { name="MidHunterX" } ]
+description = "One CRUD to rule them all"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/MidHunterX/Anisodactyl"
+Issues = "https://github.com/MidHunterX/Anisodactyl/issues"
+
+# █▄▄ █░█ █ █░░ █▀▄
+# █▄█ █▄█ █ █▄▄ █▄▀
+# =================
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build]
+exclude = [ "venv/", ".venv/", "env/", ".env/" ]
