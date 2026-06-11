@@ -11,7 +11,7 @@ class TestCRUDBase:
     def crud(self, test_model):
         return CRUDBase[Model, CreateSchema, UpdateSchema](test_model)
 
-    async def test_create(self, db_session, crud):
+    async def test_create(self, db_session, crud: CRUDBase):
         obj_in = CreateSchema(name="Test Item", description="Test Description")
         db_obj = await crud.create(db_session, obj_in=obj_in)
 
@@ -19,7 +19,7 @@ class TestCRUDBase:
         assert db_obj.name == "Test Item"
         assert db_obj.description == "Test Description"
 
-    async def test_get(self, db_session, crud):
+    async def test_get(self, db_session, crud: CRUDBase):
         # Create an object first
         obj_in = CreateSchema(name="Fetch Me")
         created_obj = await crud.create(db_session, obj_in=obj_in)
@@ -30,7 +30,13 @@ class TestCRUDBase:
         assert fetched_obj.id == created_obj.id
         assert fetched_obj.name == "Fetch Me"
 
-    async def test_get_multi(self, db_session, crud):
+        # Test filters
+        obj_filtered = await crud.get(db_session, name="Fetch Me", id=1)
+        assert obj_filtered is not None
+        obj_filtered = await crud.get(db_session, name="No Fetch Me")
+        assert obj_filtered is None
+
+    async def test_get_multi(self, db_session, crud: CRUDBase):
         # Create multiple objects
         await crud.create(db_session, obj_in=CreateSchema(name="Item 1"))
         await crud.create(db_session, obj_in=CreateSchema(name="Item 2"))
@@ -44,7 +50,11 @@ class TestCRUDBase:
         objs_skipped = await crud.get_multi(db_session, skip=2, limit=2)
         assert len(objs_skipped) == 1
 
-    async def test_update_with_schema(self, db_session, crud):
+        # Test filters
+        objs_filtered = await crud.get_multi(db_session, name="Item 2", id=2)
+        assert len(objs_filtered) == 1
+
+    async def test_update_with_schema(self, db_session, crud: CRUDBase):
         # Create
         db_obj = await crud.create(db_session, obj_in=CreateSchema(name="Old Name"))
 
@@ -55,7 +65,7 @@ class TestCRUDBase:
         assert updated_obj.name == "New Name"
         assert updated_obj.id == db_obj.id
 
-    async def test_update_with_dict(self, db_session, crud):
+    async def test_update_with_dict(self, db_session, crud: CRUDBase):
         # Create
         db_obj = await crud.create(db_session, obj_in=CreateSchema(name="Old Name"))
 
@@ -65,7 +75,7 @@ class TestCRUDBase:
 
         assert updated_obj.name == "Dict Name"
 
-    async def test_remove(self, db_session, crud):
+    async def test_remove(self, db_session, crud: CRUDBase):
         # Create
         db_obj = await crud.create(db_session, obj_in=CreateSchema(name="Delete Me"))
         obj_id = db_obj.id
@@ -79,6 +89,6 @@ class TestCRUDBase:
         found_obj = await crud.get(db_session, id=obj_id)
         assert found_obj is None
 
-    async def test_get_non_existent(self, db_session, crud):
+    async def test_get_non_existent(self, db_session, crud: CRUDBase):
         obj = await crud.get(db_session, id=999)
         assert obj is None
