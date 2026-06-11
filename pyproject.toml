@@ -15,6 +15,13 @@ classifiers = [
 ]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
+# `pip install -e .` to install package + dependencies
+dependencies = [ "sqlalchemy[asyncio]", "pydantic" ]
+
+[project.optional-dependencies]
+# `pip install -e .[test]` to install package + dependencies + test
+test = [ "pytest", "pytest-asyncio", "aiosqlite" ]
+dev = [ "anisodactyl[test]" ]
 
 [project.urls]
 Homepage = "https://github.com/MidHunterX/Anisodactyl"

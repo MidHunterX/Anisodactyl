@@ -60,9 +60,15 @@ c1 & c2 & c3 === s === p
 
 - Package Structure: [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 
+Generate packages for development (editable)
+
+```sh
+pip install -e .[dev]
+```
+
 Generate distribution archives
 
 ```sh
-python3 -m pip install --upgrade build
-python3 -m build
+python -m pip install --upgrade build
+python -m build
 ```
