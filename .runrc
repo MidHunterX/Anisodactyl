@@ -1,0 +1,21 @@
+# vim: set filetype=bash :
+
+setup_env_custom() {
+    local dependency_dir="venv"
+    local dependency_cmd="python -m venv venv"
+    if [[ ! -d $dependency_dir ]]; then
+        setup_base_env "$dependency_dir" "$dependency_cmd"
+        # shellcheck disable=SC1090
+        source "./$dependency_dir/bin/activate"
+        log "📦 Installing dependencies"
+        pip install -e .[dev]
+    else
+        # shellcheck disable=SC1090
+        source "./$dependency_dir/bin/activate"
+    fi
+}
+
+setup_layout_custom() {
+  create_window "Editor" "$EDITOR"
+  create_window "Test" "clear && pytest"
+}
