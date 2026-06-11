@@ -8,21 +8,23 @@ from sqlalchemy.orm import DeclarativeBase
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
+JSONType = dict[str, Any]
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
-    async def get(self, db: AsyncSession, id: Any) -> Optional[ModelType]:
-        query = select(self.model).where(self.model.id == id)
+    async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
+        """Usage: `crud.get(db, id=1)` OR `crud.get(db, email="test@test.com")`"""
+        query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)
         return result.scalar_one_or_none()
 
     async def get_multi(
-        self, db: AsyncSession, *, skip: int = 0, limit: int = 100
+        self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs
     ) -> Sequence[ModelType]:
-        query = select(self.model).offset(skip).limit(limit)
+        query = select(self.model).filter_by(**kwargs).offset(skip).limit(limit)
         result = await db.execute(query)
         return result.scalars().all()
 
@@ -39,7 +41,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: AsyncSession,
         *,
         db_model: ModelType,
-        obj_in: UpdateSchemaType | dict[str, Any],
+        obj_in: UpdateSchemaType | JSONType,
     ) -> ModelType:
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -55,8 +57,9 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         await db.refresh(db_model)
         return db_model
 
-    async def remove(self, db: AsyncSession, *, id: int) -> Optional[ModelType]:
-        query = select(self.model).where(self.model.id == id)
+    async def remove(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
+        """Usage: `crud.remove(db, id=1)` OR `crud.remove(db, email="test@test.com")`"""
+        query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)
         obj = result.scalar_one_or_none()
         if obj:
