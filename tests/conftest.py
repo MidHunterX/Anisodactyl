@@ -1,6 +1,5 @@
 from typing import Optional
 
-import pytest
 import pytest_asyncio
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
@@ -16,6 +15,7 @@ class Base(DeclarativeBase):
 
 
 class Model(Base):
+    """SQLAlchemy model for testing."""
     __tablename__ = "test_model"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
@@ -23,11 +23,13 @@ class Model(Base):
 
 
 class CreateSchema(BaseModel):
+    """Pydantic schema for testing."""
     name: str
     description: Optional[str] = None
 
 
 class UpdateSchema(BaseModel):
+    """Pydantic schema for testing."""
     name: Optional[str] = None
     description: Optional[str] = None
 
@@ -54,18 +56,3 @@ async def db_session():
         yield session
 
     await engine.dispose()
-
-
-@pytest.fixture
-def test_model():
-    return Model
-
-
-@pytest.fixture
-def create_schema():
-    return CreateSchema
-
-
-@pytest.fixture
-def update_schema():
-    return UpdateSchema

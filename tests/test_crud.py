@@ -1,5 +1,6 @@
 import pytest
 from conftest import CreateSchema, Model, UpdateSchema
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from anisodactyl.crud import CRUDBase
 
@@ -8,8 +9,8 @@ from anisodactyl.crud import CRUDBase
 class TestCRUDBase:
 
     @pytest.fixture
-    def crud(self, test_model):
-        return CRUDBase[Model, CreateSchema, UpdateSchema](test_model)
+    def crud(self):
+        return CRUDBase[Model, CreateSchema, UpdateSchema](Model)
 
     async def test_create(self, db_session, crud: CRUDBase):
         obj_in = CreateSchema(name="Test Item", description="Test Description")
@@ -18,6 +19,46 @@ class TestCRUDBase:
         assert db_obj.id is not None
         assert db_obj.name == "Test Item"
         assert db_obj.description == "Test Description"
+
+    async def test_transaction_pass(self, db_session: AsyncSession, crud: CRUDBase):
+        async with db_session.begin():
+            await crud.create(
+                db_session,
+                obj_in=CreateSchema(name="Test Item"),
+                auto_commit=False,
+            )
+            await crud.create(
+                db_session,
+                obj_in=CreateSchema(name="Test Item 2"),
+                auto_commit=False,
+            )
+            await crud.create(
+                db_session,
+                obj_in=CreateSchema(name="Test Item 3"),
+                auto_commit=False,
+            )
+
+        objs = await crud.get_multi(db_session)
+        assert len(objs) == 3
+
+    async def test_transaction_fail(self, db_session: AsyncSession, crud: CRUDBase):
+        with pytest.raises(Exception):
+            async with db_session.begin():
+                obj = await crud.create(
+                    db_session,
+                    obj_in=CreateSchema(name="Test Item"),
+                    auto_commit=False,
+                )
+                await crud.update(
+                    db_session,
+                    db_model=obj,
+                    obj_in=CreateSchema(name="Test Item 2"),
+                    auto_commit=False,
+                )
+                raise Exception
+
+        objs = await crud.get_multi(db_session)
+        assert len(objs) == 0
 
     async def test_get(self, db_session, crud: CRUDBase):
         # Create an object first

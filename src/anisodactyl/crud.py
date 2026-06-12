@@ -30,20 +30,33 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await db.execute(query)
         return result.scalars().all()
 
-    async def create(self, db: AsyncSession, *, obj_in: CreateSchemaType) -> ModelType:
+    async def create(
+        self,
+        db: AsyncSession,
+        *,
+        obj_in: CreateSchemaType,
+        auto_commit: bool = True,
+    ) -> ModelType:
         obj_data = obj_in.model_dump()
         db_obj = self.model(**obj_data)
         db.add(db_obj)
-        await db.commit()
-        await db.refresh(db_obj)
+        if auto_commit:
+            await db.commit()
+            await db.refresh(db_obj)
+        else:
+            await db.flush()
         return db_obj
 
+    # Why does this need db_model?
+    # update() does what it is responsible for.
+    # you can instead get creative on get() using kwargs filtering
     async def update(
         self,
         db: AsyncSession,
         *,  # everything after this point must be passed as a keyword only
         db_model: ModelType,
         obj_in: UpdateSchemaType | JSONType,
+        auto_commit: bool = True,
     ) -> ModelType:
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -55,16 +68,28 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 setattr(db_model, field, update_data[field])
 
         db.add(db_model)
-        await db.commit()
-        await db.refresh(db_model)
+        if auto_commit:
+            await db.commit()
+            await db.refresh(db_model)
+        else:
+            await db.flush()
         return db_model
 
-    async def remove(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
+    async def remove(
+        self,
+        db: AsyncSession,
+        *,
+        auto_commit: bool = True,
+        **kwargs,
+    ) -> Optional[ModelType]:
         """Usage: `crud.remove(db, id=1)` OR `crud.remove(db, email="test@test.com")`"""
         query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)
         obj = result.scalar_one_or_none()
         if obj:
             await db.delete(obj)
-            await db.commit()
+            if auto_commit:
+                await db.commit()
+            else:
+                await db.flush()
         return obj
