@@ -1,3 +1,5 @@
+![A horizontal tech-noir banner for the 'Anisodactyl' CRUD automation library. The design features a dark, textured background composed of a grid of muted grey symbols that resemble futuristic or alien hieroglyphics. At the center, two large, minimalist white icons depict an artistic representation of anisodactyl bird footprints. A metaphorical nod to 'Crow’s Foot' database notation, where the hallux represents a parent table and the forward digits represent child relations. Below the icons, the word 'Anisodactyl' is rendered in a custom, geometric 'Modern Hieroglyphic' script, bridging the gap between ancient record-keeping and modern relational database architecture](./.assets/anisodactyl.jpg)
+
 # Anisodactyl
 
 > One CRUD to rule them all.
