@@ -17,6 +17,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
         """Usage: `crud.get(db, id=1)` OR `crud.get(db, email="test@test.com")`"""
+        if not kwargs:  # Prevent full table query
+            raise ValueError("At least one filter is required (db, id=1).")
         query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)
         return result.scalar_one_or_none()
@@ -39,7 +41,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def update(
         self,
         db: AsyncSession,
-        *,
+        *,  # everything after this point must be passed as a keyword only
         db_model: ModelType,
         obj_in: UpdateSchemaType | JSONType,
     ) -> ModelType:
