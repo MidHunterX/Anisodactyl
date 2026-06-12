@@ -9,14 +9,26 @@ This tries to solve the following problems:
 - Headless CRUD Engine
 - Automatic CRUD API Endpoints
 
-## Intro
+## 🚀 Quick Start
 
-Why write boring crud again and again especially when it's almost the same logic everywhere?
+### Installation
+
+```sh
+pip install git+https://github.com/MidHunterX/Anisodactyl.git
+```
+
+### Development
+
+```sh
+git clone https://github.com/MidHunterX/Anisodactyl.git
+cd Anisodactyl
+pip install -e .[dev]
+```
+
+## 👀 Vision
 
 A typical CRUD manipulates a database structure in this structure where each node is a table: `Parent? --- Current --< Children?`.
 Every table in your interconnected database sits at the center of it's own relationship graph; optional `Parent` pointing inwards and optional `Children` pointing outwards.
-
-Current object can be anything. It can be one of the children as well, being able to create any graph like structure imaginable.
 
 ```mermaid
 graph TD
@@ -56,15 +68,11 @@ c1 & c2 & c3 === s === p
 
 > The diagram above forms the shape of an anisodactyl "[crow foot](https://en.wikipedia.org/wiki/Entity–relationship_model#Crow's_foot_notation)" - digits (children), hallux (parent), connected through the central tarsometatarsus self.
 
-## Notes
+Current object can be anything. It can be one of the children as well, being able to create any graph like structure imaginable.
+
+## 📚 Notes
 
 - Package Structure: [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
-
-Generate packages for development (editable)
-
-```sh
-pip install -e .[dev]
-```
 
 Generate distribution archives
 
