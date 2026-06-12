@@ -82,3 +82,14 @@ Generate distribution archives
 python -m pip install --upgrade build
 python -m build
 ```
+
+<!--
+Fun fact
+My thought process when creating the banner were:
+- In a chain of relational database at any table/point, there will be the current table, an optional parent table which this table requires, optional number of child tables in relation.
+- This almost looks like a bird's feet... parent as hallux, current as tarsometatarsus and child tables as digits
+- The bird feet structure is known as Anisodactyl.
+- "Crow's Foot" notation is used for designing Database ER diagrams.
+- Birds are commonly used in ancient hieroglyphics but, database technologies are modern therefore the modern version of hieroglyphics is used as the whole aesthetic.
+- and anisodactyl is chosen for the CRUD automation library
+-->

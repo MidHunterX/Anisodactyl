@@ -31,21 +31,11 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalars().all()
 
     async def create(
-        self,
-        db: AsyncSession,
-        *,
-        obj_in: CreateSchemaType,
-        auto_commit: bool = True,
+        self, db: AsyncSession, *, obj_in: CreateSchemaType, auto_commit: bool = True
     ) -> ModelType:
         obj_data = obj_in.model_dump()
         db_obj = self.model(**obj_data)
-        db.add(db_obj)
-        if auto_commit:
-            await db.commit()
-            await db.refresh(db_obj)
-        else:
-            await db.flush()
-        return db_obj
+        return await self._save(db, db_obj, auto_commit)
 
     # Why does this need db_model?
     # update() does what it is responsible for.
@@ -53,7 +43,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     async def update(
         self,
         db: AsyncSession,
-        *,  # everything after this point must be passed as a keyword only
+        *,
         db_model: ModelType,
         obj_in: UpdateSchemaType | JSONType,
         auto_commit: bool = True,
@@ -67,20 +57,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             if hasattr(db_model, field):
                 setattr(db_model, field, update_data[field])
 
-        db.add(db_model)
-        if auto_commit:
-            await db.commit()
-            await db.refresh(db_model)
-        else:
-            await db.flush()
-        return db_model
+        return await self._save(db, db_model, auto_commit)
 
     async def remove(
-        self,
-        db: AsyncSession,
-        *,
-        auto_commit: bool = True,
-        **kwargs,
+        self, db: AsyncSession, *, auto_commit: bool = True, **kwargs
     ) -> Optional[ModelType]:
         """Usage: `crud.remove(db, id=1)` OR `crud.remove(db, email="test@test.com")`"""
         query = select(self.model).filter_by(**kwargs)
@@ -93,3 +73,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             else:
                 await db.flush()
         return obj
+
+    async def _save(
+        self, db: AsyncSession, model: ModelType, auto_commit: bool
+    ) -> ModelType:
+        db.add(model)
+        if auto_commit:
+            await db.commit()
+            await db.refresh(model)
+        else:
+            await db.flush()
+        return model
