@@ -1,7 +1,8 @@
-from typing import Any, Generic, Optional, Sequence, Type, TypeVar
+from typing import (Any, Callable, Dict, Generic, Optional, Sequence, Type,
+                    TypeVar)
 
 from pydantic import BaseModel
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
@@ -15,6 +16,24 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, model: Type[ModelType]):
         self.model = model
 
+        self._operators: Dict[str, Callable[[Any, Any], ColumnElement]] = {
+            "eq": lambda field, val: field == val,
+            "ne": lambda field, val: field != val,
+            "gt": lambda field, val: field > val,
+            "lt": lambda field, val: field < val,
+            "gte": lambda field, val: field >= val,
+            "lte": lambda field, val: field <= val,
+            "contains": lambda field, val: field.ilike(f"%{val}%"),
+            "startswith": lambda field, val: field.ilike(f"{val}%"),
+            "endswith": lambda field, val: field.ilike(f"%{val}"),
+            "in": lambda field, val: field.in_(
+                val if isinstance(val, list) else val.split(",")
+            ),
+            "isnull": lambda field, val: (
+                field.is_(None) if val.lower() == "true" else field.is_not(None)
+            ),
+        }
+
     async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
         """Usage: `crud.get(db, id=1)` OR `crud.get(db, email="test@test.com")`"""
         if not kwargs:  # Prevent full table query
@@ -24,9 +43,33 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalar_one_or_none()
 
     async def get_multi(
-        self, db: AsyncSession, skip: int = 0, limit: int = 100, **kwargs
+        self,
+        db: AsyncSession,
+        skip: int = 0,
+        limit: int = 100,
+        filters: Optional[list[JSONType]] = None,
+        **kwargs,
     ) -> Sequence[ModelType]:
-        query = select(self.model).filter_by(**kwargs).offset(skip).limit(limit)
+        """
+        Backend Usage: `crud.get(db, email="test@test.com")`
+        JSON Usage: `crud.get(db, filters=[{"field": "email", "op": "eq", "value": "test@test.com"}])`
+        """
+        query = select(self.model)
+
+        # Anisodactyl Dynamic Filters for API
+        if filters:
+            for f in filters:
+                field = getattr(self.model, f["field"], None)
+                operator = f["op"]
+                value = f["value"]
+
+                if field is not None and operator in self._operators:
+                    query = query.where(self._operators[operator](field, value))
+        # kwargs filtering for Backend
+        if kwargs:
+            query = query.filter_by(**kwargs)
+
+        query = query.offset(skip).limit(limit)
         result = await db.execute(query)
         return result.scalars().all()
 
