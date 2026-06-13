@@ -9,11 +9,6 @@ from typing_extensions import Dict
 
 from anisodactyl.query.base import FilterDict
 
-# In a generic Protocol:
-# * Contravariant (contravariant=True): Used for types in input positions
-# * Covariant (covariant=True): Used for types in output positions
-# * Invariant (default): Used if the type used in both input and output positions.
-
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel, contravariant=True)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel, contravariant=True)

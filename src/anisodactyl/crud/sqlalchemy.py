@@ -8,17 +8,14 @@ from sqlalchemy.orm import DeclarativeBase
 
 from anisodactyl.query.base import FilterDict
 
-from .base import CRUDProtocol
-
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 JSONType = dict[str, Any]
-CRUDType = CRUDProtocol[ModelType, CreateSchemaType, UpdateSchemaType]
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self: CRUDType, model: Type[ModelType]):
+    def __init__(self, model: Type[ModelType]):
         self.model = model
 
         self._operators: Dict[str, Callable[[Any, Any], ColumnElement]] = {
@@ -61,7 +58,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         """
         query = select(self.model)
 
-        # Anisodactyl Dynamic Filters for API
+        # Dynamic Filters for API
         if filters:
             for f in filters:
                 field = getattr(self.model, f["field"], None)
@@ -70,6 +67,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
                 if field is not None and operator in self._operators:
                     query = query.where(self._operators[operator](field, value))
+
         # kwargs filtering for Backend
         if kwargs:
             query = query.filter_by(**kwargs)

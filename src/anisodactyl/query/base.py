@@ -12,11 +12,6 @@ class FilterDict(TypedDict):
 
 @runtime_checkable
 class QueryParserProtocol(Protocol):
-    """
-    Any class passed to RouterBase as a query parser must implement this
-    structure.
-    """
-
     filters: List[FilterDict]
     sort: List[str]
     fields: List[str]

@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 from typing_extensions import Literal
 
+from anisodactyl.crud.base import CRUDProtocol
+from anisodactyl.query.anisodactyl import QueryParams  # Default Query Parser
 from anisodactyl.query.base import QueryParserProtocol
-from anisodactyl.query.sqlalchemy import QueryParams # Default Query Parser
-from anisodactyl.crud.sqlalchemy import CRUDBase # For Type Hinting
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -28,7 +28,7 @@ class RouterBase(
         # CRUD PARAMETERS
         # ===============
         model: Type[ModelType],
-        crud: CRUDBase,
+        crud: CRUDProtocol,
         create_schema: Type[CreateSchemaType],
         update_schema: Type[UpdateSchemaType],
         response_schema: Type[ResponseSchemaType],

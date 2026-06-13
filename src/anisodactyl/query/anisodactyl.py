@@ -2,7 +2,7 @@ from typing import List
 
 from fastapi import Request
 
-from .base import FilterDict, QueryParserProtocol
+from .base import FilterDict
 
 
 class QueryParams:
@@ -13,7 +13,7 @@ class QueryParams:
     ?fields=a,b,c       -> field selection
     """
 
-    def __init__(self: QueryParserProtocol, request: Request):
+    def __init__(self, request: Request):
         self.filters: List[FilterDict] = []
         self.sort: List[str] = []
         self.fields: List[str] = []
