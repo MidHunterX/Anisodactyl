@@ -5,16 +5,20 @@ from pydantic import BaseModel
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
+
 from anisodactyl.query.base import FilterDict
+
+from .base import CRUDProtocol
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 JSONType = dict[str, Any]
+CRUDType = CRUDProtocol[ModelType, CreateSchemaType, UpdateSchemaType]
 
 
 class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType]):
+    def __init__(self: CRUDType, model: Type[ModelType]):
         self.model = model
 
         self._operators: Dict[str, Callable[[Any, Any], ColumnElement]] = {
