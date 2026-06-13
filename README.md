@@ -1,4 +1,4 @@
-![A horizontal tech-noir banner for the 'Anisodactyl' CRUD automation library. The design features a dark, textured background composed of a grid of muted grey symbols that resemble futuristic or alien hieroglyphics. At the center, two large, minimalist white icons depict an artistic representation of anisodactyl bird footprints. A metaphorical nod to 'Crow’s Foot' database notation, where the hallux represents a parent table and the forward digits represent child relations. Below the icons, the word 'Anisodactyl' is rendered in a custom, geometric 'Modern Hieroglyphic' script, bridging the gap between ancient record-keeping and modern relational database architecture](./.assets/anisodactyl.jpg)
+![A horizontal tech-noir banner for the 'Anisodactyl' library. The design features a dark, textured background composed of a grid of muted grey symbols that resemble futuristic or alien hieroglyphics. At the center, two large, minimalist white icons depict an artistic representation of anisodactyl bird footprints. A metaphorical nod to 'Crow’s Foot' database notation, where the hallux represents a parent table and the forward digits represent child relations. Below the icons, the word 'Anisodactyl' is rendered in a custom, geometric 'Modern Hieroglyphic' script, bridging the gap between ancient record-keeping and modern relational database architecture](./.assets/anisodactyl.jpg)
 
 # Anisodactyl
 
@@ -74,6 +74,25 @@ Current object can be anything. It can be one of the children as well, being abl
 
 ## 📚 Notes
 
+- Query Parameter Conventions:
+  - [JSON API](https://jsonapi.org/format/#query-parameters)
+  ```
+  // ?filter[key][operator]=value&[key][operator]=value
+  ?filter%5Bkey%5D%5Boperator%5D=value&%5Bkey%5D%5Boperator%5D=value
+  ```
+  but `[` and `]` gets encoded into `%5B` and `%5D` which makes URLs ugly and unreadable.
+  - [Django REST Framework](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter), [django-url-filter](https://github.com/miki725/django-url-filter)
+  ```
+  ?filter=key__operator=value&key__operator=value
+  ```
+  The python standard due to Django influence.
+  - Anisodactyl
+  ```
+  ?key=operator:value&key=operator:value
+  ?fields=key1,key2,key3
+  ?sort=-metadata,key
+  ```
+  Super clean, simple and developer centric.
 - Package Structure: [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 
 Generate distribution archives

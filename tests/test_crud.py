@@ -2,11 +2,15 @@ import pytest
 from conftest import CreateSchema, Model, UpdateSchema
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from anisodactyl.crud import CRUDBase
+from anisodactyl import CRUDBase
 
 
 @pytest.mark.asyncio
 class TestCRUDBase:
+    # Why class for test?
+    # pytest doesn't natively support async testing.
+    # We use pytest-asyncio. It need decorator on top of tests.
+    # The best way to do is: Group tests in class. Add decorator to class.
 
     @pytest.fixture
     def crud(self):
