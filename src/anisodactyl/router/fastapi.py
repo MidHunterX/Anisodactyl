@@ -8,7 +8,8 @@ from sqlalchemy.orm import DeclarativeBase
 from typing_extensions import Literal
 
 from anisodactyl.query.base import QueryParserProtocol
-from anisodactyl.query.sqlalchemy import QueryParams
+from anisodactyl.query.sqlalchemy import QueryParams # Default Query Parser
+from anisodactyl.crud.sqlalchemy import CRUDBase # For Type Hinting
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -27,7 +28,7 @@ class RouterBase(
         # CRUD PARAMETERS
         # ===============
         model: Type[ModelType],
-        crud: Any, # TODO: Add typing
+        crud: CRUDBase,
         create_schema: Type[CreateSchemaType],
         update_schema: Type[UpdateSchemaType],
         response_schema: Type[ResponseSchemaType],
@@ -57,7 +58,12 @@ class RouterBase(
             offset: int = 0,
         ):
             return await self.crud.get_multi(
-                db, filters=params.filters, limit=limit, offset=offset
+                db=db,
+                filters=params.filters,
+                sort=params.sort,
+                fields=params.fields,
+                limit=limit,
+                offset=offset,
             )
 
     async def get_router(self) -> APIRouter:

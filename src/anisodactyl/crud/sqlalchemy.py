@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
+from anisodactyl.query.base import FilterDict
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -47,7 +48,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db: AsyncSession,
         skip: int = 0,
         limit: int = 100,
-        filters: Optional[list[JSONType]] = None,
+        filters: Optional[list[FilterDict]] = None,
         **kwargs,
     ) -> Sequence[ModelType]:
         """
