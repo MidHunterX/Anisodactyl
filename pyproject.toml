@@ -27,8 +27,10 @@ dependencies = [
 test = [
     "pytest",           # Standard testing framework
     "pytest-asyncio",   # pytest async support
-    "pytest-sugar",     # Colorful CLI progress bars for pytest
-    "pytest-clarity",   # Coloured diff output pytest (-vv only)
+    # "pytest-sugar",     # Colorful CLI progress bars for pytest
+    # "pytest-clarity",   # Coloured diff output pytest (-vv only)
+    # "pytest-pretty",    # Rich table of failures with line numbers (conflicts with progress bars)
+    "pytest-modern",    # Modern pytest UI - stdout/stderr, syntax highlighting, icons, error breakdowns etc.
     "aiosqlite",        # Async SQLite
     "httpx"             # HTTP client for routers
 ]
