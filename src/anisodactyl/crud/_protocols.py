@@ -17,15 +17,10 @@ JSONType = dict[str, Any]
 
 @runtime_checkable
 class CRUDProtocol(Protocol[ModelType, CreateSchemaType, UpdateSchemaType]):
-    """Interface defining the structure of a CRUD class"""
-
     model: Type[ModelType]
-
     _operators: Dict[str, Callable[[Any, Any], ColumnElement]]
 
-    async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
-        """Get a single record by field filters"""
-        ...
+    async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]: ...
 
     async def get_multi(
         self,
@@ -34,15 +29,11 @@ class CRUDProtocol(Protocol[ModelType, CreateSchemaType, UpdateSchemaType]):
         limit: int = 100,
         filters: Optional[list[FilterDict]] = None,
         **kwargs,
-    ) -> Sequence[ModelType]:
-        """Get multiple records with optional filtering"""
-        ...
+    ) -> Sequence[ModelType]: ...
 
     async def create(
-        self, db: AsyncSession, *, obj_in: CreateSchemaType, auto_commit: bool = True
-    ) -> ModelType:
-        """Create a new record"""
-        ...
+        self, db: AsyncSession, *, obj_in: CreateSchemaType, auto_commit: bool = True,
+    ) -> ModelType: ...
 
     async def update(
         self,
@@ -51,12 +42,8 @@ class CRUDProtocol(Protocol[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_model: ModelType,
         obj_in: UpdateSchemaType | JSONType,
         auto_commit: bool = True,
-    ) -> ModelType:
-        """Update an existing record"""
-        ...
+    ) -> ModelType: ...
 
     async def remove(
         self, db: AsyncSession, *, auto_commit: bool = True, **kwargs
-    ) -> Optional[ModelType]:
-        """Remove a record by field filters"""
-        ...
+    ) -> Optional[ModelType]: ...

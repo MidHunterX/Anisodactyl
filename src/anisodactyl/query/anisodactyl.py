@@ -2,15 +2,15 @@ from typing import List
 
 from fastapi import Request
 
-from .base import FilterDict
+from ._protocols import FilterDict
 
 
 class QueryParams:
     """
     Anisodactyl URL spec:
-    ?key=operator:value -> filtering
-    ?sort=-key,key      -> sorting
-    ?fields=a,b,c       -> field selection
+    ?key=operator:value -> filters[{"field": key, "op": operator, "value": value}]
+    ?sort=-key,key      -> sort[key, -key]
+    ?fields=a,b,c       -> fields[a, b, c]
     """
 
     def __init__(self, request: Request):
