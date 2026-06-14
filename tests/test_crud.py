@@ -137,3 +137,25 @@ class TestCRUDBase:
     async def test_get_non_existent(self, db_session, crud: CRUDBase):
         obj = await crud.get(db_session, id=999)
         assert obj is None
+
+    async def test_sort_and_filter(self, db_session, crud: CRUDBase):
+        dataset = {
+            "Apple": "Fruit",
+            "Banana": "Fruit",
+            "Carrot": "Vegetable",
+        }
+        for k, v in dataset.items():
+            await crud.create(db_session, obj_in=CreateSchema(name=k, description=v))
+
+        obj = await crud.get_multi(
+            db_session,
+            filters=[{"field": "description", "op": "eq", "value": "Fruit"}],
+            sort=["-name"],
+            fields=["name", "description"],
+        )
+
+        # Verify filter
+        assert len(obj) == 2
+        # Verify sort
+        assert obj[0].name == "Banana"
+        assert obj[1].name == "Apple"

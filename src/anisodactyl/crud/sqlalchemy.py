@@ -4,7 +4,7 @@ from typing import (Any, Callable, Dict, Generic, Optional, Sequence, Type,
 from pydantic import BaseModel
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, load_only
 
 from anisodactyl.query.base import FilterDict
 
@@ -28,12 +28,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             "contains": lambda field, val: field.ilike(f"%{val}%"),
             "startswith": lambda field, val: field.ilike(f"{val}%"),
             "endswith": lambda field, val: field.ilike(f"%{val}"),
-            "in": lambda field, val: field.in_(
-                val if isinstance(val, list) else val.split(",")
-            ),
-            "isnull": lambda field, val: (
-                field.is_(None) if val.lower() == "true" else field.is_not(None)
-            ),
         }
 
     async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
@@ -50,23 +44,46 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         skip: int = 0,
         limit: int = 100,
         filters: Optional[list[FilterDict]] = None,
+        sort: Optional[list[str]] = None,
+        fields: Optional[list[str]] = None,
         **kwargs,
     ) -> Sequence[ModelType]:
         """
-        Backend Usage: `crud.get(db, email="test@test.com")`
-        JSON Usage: `crud.get(db, filters=[{"field": "email", "op": "eq", "value": "test@test.com"}])`
+        Backend Usage: `crud.get_multi(db, email="test@test.com")`
+        JSON Usage: `crud.get_multi(db, filters=[{"field": "email", "op": "eq", "value": "test@test.com"}])`
         """
         query = select(self.model)
 
-        # Dynamic Filters for API
+        if fields:
+            valid_fields = []
+            for field_name in fields:
+                if hasattr(self.model, field_name):
+                    valid_fields.append(getattr(self.model, field_name))
+            if valid_fields:
+                query = query.options(load_only(*valid_fields))
+
         if filters:
             for f in filters:
                 field = getattr(self.model, f["field"], None)
                 operator = f["op"]
                 value = f["value"]
-
                 if field is not None and operator in self._operators:
                     query = query.where(self._operators[operator](field, value))
+
+        if sort:
+            for sort_field in sort:
+                if sort_field.startswith("-"):
+                    field_name = sort_field[1:]
+                    descending = True
+                else:
+                    field_name = sort_field
+                    descending = False
+                field_attr = getattr(self.model, field_name, None)
+                if field_attr is not None:
+                    if descending:
+                        query = query.order_by(field_attr.desc())
+                    else:
+                        query = query.order_by(field_attr.asc())
 
         # kwargs filtering for Backend
         if kwargs:
