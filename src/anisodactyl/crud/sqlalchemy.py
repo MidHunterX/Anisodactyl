@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar
+from typing import Any, Callable, Dict, Optional, Sequence, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import ColumnElement, select
@@ -13,7 +13,9 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 JSONType = dict[str, Any]
 
 
-class CRUDBase(CRUDProtocol[ModelType, CreateSchemaType, UpdateSchemaType]):
+class CRUDBase(
+    CRUDProtocol[ModelType, CreateSchemaType, UpdateSchemaType, AsyncSession]
+):
     def __init__(self, model):
         self.model = model
 
