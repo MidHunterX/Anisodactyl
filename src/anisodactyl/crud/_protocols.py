@@ -5,9 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import ColumnElement
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
-from typing_extensions import Dict
-
-from anisodactyl.query.base import FilterDict
+from typing_extensions import Dict, TypedDict
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel, contravariant=True)
@@ -15,10 +13,15 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel, contravariant=Tr
 JSONType = dict[str, Any]
 
 
+class FilterDict(TypedDict):
+    field: str
+    op: str
+    value: Any
+
+
 @runtime_checkable
 class CRUDProtocol(Protocol[ModelType, CreateSchemaType, UpdateSchemaType]):
-    model: Type[ModelType]
-    _operators: Dict[str, Callable[[Any, Any], ColumnElement]]
+    def __init__(self, model: Type[ModelType]): ...
 
     async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]: ...
 
@@ -28,11 +31,17 @@ class CRUDProtocol(Protocol[ModelType, CreateSchemaType, UpdateSchemaType]):
         skip: int = 0,
         limit: int = 100,
         filters: Optional[list[FilterDict]] = None,
+        sort: Optional[list[str]] = None,
+        fields: Optional[list[str]] = None,
         **kwargs,
     ) -> Sequence[ModelType]: ...
 
     async def create(
-        self, db: AsyncSession, *, obj_in: CreateSchemaType, auto_commit: bool = True,
+        self,
+        db: AsyncSession,
+        *,
+        obj_in: CreateSchemaType,
+        auto_commit: bool = True,
     ) -> ModelType: ...
 
     async def update(

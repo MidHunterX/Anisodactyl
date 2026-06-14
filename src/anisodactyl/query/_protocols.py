@@ -1,13 +1,8 @@
-from typing import Any, List, Protocol, runtime_checkable
+from typing import List, Protocol, runtime_checkable
 
 from fastapi import Request
-from typing_extensions import TypedDict
 
-
-class FilterDict(TypedDict):
-    field: str
-    op: str
-    value: Any
+from anisodactyl.crud._protocols import FilterDict
 
 
 @runtime_checkable

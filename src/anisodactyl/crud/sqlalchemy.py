@@ -1,12 +1,11 @@
-from typing import (Any, Callable, Dict, Generic, Optional, Sequence, Type,
-                    TypeVar)
+from typing import Any, Callable, Dict, Optional, Sequence, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import ColumnElement, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase, load_only
 
-from anisodactyl.query._protocols import FilterDict
+from ._protocols import CRUDProtocol
 
 ModelType = TypeVar("ModelType", bound=DeclarativeBase)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -14,8 +13,8 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 JSONType = dict[str, Any]
 
 
-class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType]):
+class CRUDBase(CRUDProtocol[ModelType, CreateSchemaType, UpdateSchemaType]):
+    def __init__(self, model):
         self.model = model
 
         self._operators: Dict[str, Callable[[Any, Any], ColumnElement]] = {
@@ -30,7 +29,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             "endswith": lambda field, val: field.ilike(f"%{val}"),
         }
 
-    async def get(self, db: AsyncSession, **kwargs) -> Optional[ModelType]:
+    async def get(self, db, **kwargs):
         """Usage: `crud.get(db, id=1)` OR `crud.get(db, email="test@test.com")`"""
         if not kwargs:  # Prevent full table query
             raise ValueError("At least one filter is required (db, id=1).")
@@ -39,14 +38,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return result.scalar_one_or_none()
 
     async def get_multi(
-        self,
-        db: AsyncSession,
-        skip: int = 0,
-        limit: int = 100,
-        filters: Optional[list[FilterDict]] = None,
-        sort: Optional[list[str]] = None,
-        fields: Optional[list[str]] = None,
-        **kwargs,
+        self, db, skip=0, limit=100, filters=None, sort=None, fields=None, **kwargs
     ) -> Sequence[ModelType]:
         """
         Backend Usage: `crud.get_multi(db, email="test@test.com")`
@@ -93,9 +85,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         result = await db.execute(query)
         return result.scalars().all()
 
-    async def create(
-        self, db: AsyncSession, *, obj_in: CreateSchemaType, auto_commit: bool = True
-    ) -> ModelType:
+    async def create(self, db, *, obj_in, auto_commit=True) -> ModelType:
         obj_data = obj_in.model_dump()
         db_obj = self.model(**obj_data)
         return await self._save(db, db_obj, auto_commit)
@@ -103,14 +93,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
     # Why does this need db_model?
     # update() does what it is responsible for.
     # you can instead get creative on get() using kwargs filtering
-    async def update(
-        self,
-        db: AsyncSession,
-        *,
-        db_model: ModelType,
-        obj_in: UpdateSchemaType | JSONType,
-        auto_commit: bool = True,
-    ) -> ModelType:
+    async def update(self, db, *, db_model, obj_in, auto_commit=True) -> ModelType:
         if isinstance(obj_in, dict):
             update_data = obj_in
         else:
@@ -122,9 +105,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
         return await self._save(db, db_model, auto_commit)
 
-    async def remove(
-        self, db: AsyncSession, *, auto_commit: bool = True, **kwargs
-    ) -> Optional[ModelType]:
+    async def remove(self, db, *, auto_commit=True, **kwargs) -> Optional[ModelType]:
         """Usage: `crud.remove(db, id=1)` OR `crud.remove(db, email="test@test.com")`"""
         query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)

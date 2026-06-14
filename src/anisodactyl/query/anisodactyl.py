@@ -1,11 +1,7 @@
-from typing import List
-
-from fastapi import Request
-
-from ._protocols import FilterDict
+from anisodactyl.query._protocols import QueryParserProtocol
 
 
-class QueryParams:
+class QueryParams(QueryParserProtocol):
     """
     Anisodactyl URL spec:
     ?key=operator:value -> filters[{"field": key, "op": operator, "value": value}]
@@ -13,10 +9,10 @@ class QueryParams:
     ?fields=a,b,c       -> fields[a, b, c]
     """
 
-    def __init__(self, request: Request):
-        self.filters: List[FilterDict] = []
-        self.sort: List[str] = []
-        self.fields: List[str] = []
+    def __init__(self, request):
+        self.filters = []
+        self.sort = []
+        self.fields = []
 
         for key, value in request.query_params.items():
             # HANDLE RESERVED KEYWORDS
