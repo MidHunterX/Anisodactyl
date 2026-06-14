@@ -74,27 +74,42 @@ Current object can be anything. It can be one of the children as well, being abl
 
 ## 📚 Notes
 
-**Query Parameter Conventions**:
-- [JSON API](https://jsonapi.org/format/#query-parameters)
-  ```
-  // ?filter[key][operator]=value&[key][operator]=value
-  ?filter%5Bkey%5D%5Boperator%5D=value&%5Bkey%5D%5Boperator%5D=value
-  ```
-  but `[` and `]` gets encoded into `%5B` and `%5D` which makes URLs ugly and unreadable.
-- [Django REST Framework](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter), [django-url-filter](https://github.com/miki725/django-url-filter)
-  ```
-  ?filter=key__operator=value&key__operator=value
-  ```
-  The python standard due to Django influence.
-- Anisodactyl
-  ```
-  ?key=operator:value&key=operator:value
-  ?fields=key1,key2,key3
-  ?sort=-metadata,key
-  ```
-  Super clean, simple and developer centric.
+### Query Parameter Conventions
 
-**Package Structure**: [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
+#### [JSON API](https://jsonapi.org/format/#query-parameters)
+
+```c
+// ?filter[key][operator]=value&[key][operator]=value
+?filter%5Bkey%5D%5Boperator%5D=value&%5Bkey%5D%5Boperator%5D=value
+```
+
+> but `[` and `]` gets encoded into `%5B` and `%5D` which makes URLs ugly and unreadable.
+
+#### [Django REST Framework](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter), [django-url-filter](https://github.com/miki725/django-url-filter)
+
+```js
+// ?post_tag=fiction&comment_count__gt=10
+?key__operator=value&key__operator=value
+```
+
+> The python standard due to Django influence.
+
+#### Anisodactyl
+
+```js
+// ?post_tag=fiction&comment_count=gt:10
+?key=operator:value&key=operator:value
+// ?fields=name,email
+?fields=key1,key2,key3
+// ?sort=-name
+?sort=-field,field
+```
+
+> Super clean, simple and developer centric.
+
+### Package Structure
+
+- [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 
 Generate distribution archives
 
