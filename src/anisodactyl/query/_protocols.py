@@ -1,8 +1,22 @@
-from typing import List, Protocol, runtime_checkable
+from typing import List, Protocol, TypeVar, runtime_checkable
 
 from fastapi import Request
 
 from anisodactyl.crud._protocols import FilterDict
+
+ALLOWED_OPS = {
+    "eq",
+    "ne",
+    "gt",
+    "lt",
+    "gte",
+    "lte",
+    "contains",
+    "startswith",
+    "endswith",
+}
+
+QuerySourceT = TypeVar("QuerySourceT", contravariant=True)  # Request, dict ...
 
 
 @runtime_checkable

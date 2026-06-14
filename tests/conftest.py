@@ -16,6 +16,7 @@ class Base(DeclarativeBase):
 
 class Model(Base):
     """SQLAlchemy model for testing."""
+
     __tablename__ = "test_model"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
@@ -24,12 +25,14 @@ class Model(Base):
 
 class CreateSchema(BaseModel):
     """Pydantic schema for testing."""
+
     name: str
     description: Optional[str] = None
 
 
 class UpdateSchema(BaseModel):
     """Pydantic schema for testing."""
+
     name: Optional[str] = None
     description: Optional[str] = None
 
@@ -56,3 +59,10 @@ async def db_session():
         yield session
 
     await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def override_get_db(db_session):
+    async def _get_db():
+        yield db_session
+    return _get_db
