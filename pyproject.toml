@@ -28,6 +28,7 @@ test = [
     "pytest",           # Standard testing framework
     "pytest-asyncio",   # pytest async support
     "pytest-sugar",     # Colorful CLI progress bars for pytest
+    "pytest-clarity",   # Coloured diff output pytest (-vv only)
     "aiosqlite",        # Async SQLite
     "httpx"             # HTTP client for routers
 ]
