@@ -3,35 +3,32 @@ from typing import Any, Generic, List, Type, TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import DeclarativeBase
-from typing_extensions import Literal
 
 from anisodactyl.crud._protocols import CRUDProtocol
-from anisodactyl.query.anisodactyl import QueryParams  # Default Query Parser
 from anisodactyl.query._protocols import QueryParserProtocol
+from anisodactyl.query.anisodactyl import QueryParams  # Default Query Parser
 
-ModelType = TypeVar("ModelType", bound=DeclarativeBase)
-CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
-UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
-ResponseSchemaType = TypeVar("ResponseSchemaType", bound=BaseModel)
+SessionT = TypeVar("SessionT", contravariant=True)
+ModelT = TypeVar("ModelT")
+CreateSchemaT = TypeVar("CreateSchemaT", bound=BaseModel)
+UpdateSchemaT = TypeVar("UpdateSchemaT", bound=BaseModel)
+ResponseSchemaT = TypeVar("ResponseSchemaT", bound=BaseModel)
 JSONType = dict[str, Any]
-RouteNames = Literal["get", "get_all", "create", "update", "delete"]
 
 
 class RouterBase(
-    Generic[ModelType, CreateSchemaType, UpdateSchemaType, ResponseSchemaType]
+    Generic[ModelT, CreateSchemaT, UpdateSchemaT, ResponseSchemaT, SessionT]
 ):
     def __init__(
         self,
         *,
         # CRUD PARAMETERS
         # ===============
-        model: Type[ModelType],
-        crud: CRUDProtocol,
-        create_schema: Type[CreateSchemaType],
-        update_schema: Type[UpdateSchemaType],
-        response_schema: Type[ResponseSchemaType],
+        model: Type[ModelT],
+        crud: CRUDProtocol[ModelT, CreateSchemaT, UpdateSchemaT, SessionT],
+        create_schema: Type[CreateSchemaT],
+        update_schema: Type[UpdateSchemaT],
+        response_schema: Type[ResponseSchemaT],
         get_db: Any,  # session dependency
         query_parser: Type[QueryParserProtocol] = QueryParams,
         # APIROUTER PARAMETERS
@@ -59,7 +56,7 @@ class RouterBase(
     def _register_getall_route(self):
         @self.router.get("/", response_model=List[self.response_schema])
         async def get_all(
-            db: AsyncSession = Depends(self.get_db),
+            db: SessionT = Depends(self.get_db),
             params: QueryParserProtocol = Depends(self.query_parser),
             limit: int = 100,
             offset: int = 0,
@@ -75,7 +72,7 @@ class RouterBase(
 
     def _register_getone_route(self):
         @self.router.get("/{id}", response_model=self.response_schema)
-        async def get_one(id: Any, db: AsyncSession = Depends(self.get_db)):
+        async def get_one(id: Any, db: SessionT = Depends(self.get_db)):
             item = await self.crud.get(db, id=id)
             if not item:
                 raise HTTPException(status_code=404, detail="Item not found")
@@ -89,7 +86,7 @@ class RouterBase(
         )
         async def create(
             data: self.create_schema,  # type: ignore
-            db: AsyncSession = Depends(self.get_db),
+            db: SessionT = Depends(self.get_db),
         ):
             return await self.crud.create(db, obj_in=data)
 
@@ -98,7 +95,7 @@ class RouterBase(
         async def update(
             id: Any,
             data: self.update_schema,  # type: ignore
-            db: AsyncSession = Depends(self.get_db),
+            db: SessionT = Depends(self.get_db),
         ):
             db_obj = await self.crud.get(db, id=id)
             if not db_obj:
@@ -107,7 +104,7 @@ class RouterBase(
 
     def _register_delete_route(self):
         @self.router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-        async def delete(id: Any, db: AsyncSession = Depends(self.get_db)):
+        async def delete(id: Any, db: SessionT = Depends(self.get_db)):
             success = await self.crud.remove(db, id=id)
             if not success:
                 raise HTTPException(status_code=404, detail="Item not found")
