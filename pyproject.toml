@@ -24,7 +24,13 @@ dependencies = [
 
 [project.optional-dependencies]
 # `pip install -e .[test]` to install package + dependencies + test
-test = [ "pytest", "pytest-asyncio", "aiosqlite", "httpx" ]
+test = [
+    "pytest",           # Standard testing framework
+    "pytest-asyncio",   # pytest async support
+    "pytest-sugar",     # Colorful CLI progress bars for pytest
+    "aiosqlite",        # Async SQLite
+    "httpx"             # HTTP client for routers
+]
 dev = [ "anisodactyl[test]" ]
 
 [project.urls]
