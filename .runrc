@@ -17,5 +17,5 @@ setup_env_custom() {
 
 setup_layout_custom() {
   create_window "Editor" "$EDITOR"
-  create_window "Test" "clear && pytest"
+  create_window "Test" "pytest"
 }
