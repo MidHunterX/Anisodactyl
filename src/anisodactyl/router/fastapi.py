@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Generic, List, Type, TypeVar
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase
@@ -50,6 +50,13 @@ class RouterBase(
         self._register_routes()
 
     def _register_routes(self):
+        self._register_getall_route()
+        self._register_getone_route()
+        self._register_create_route()
+        self._register_update_route()
+        self._register_delete_route()
+
+    def _register_getall_route(self):
         @self.router.get("/", response_model=List[self.response_schema])
         async def get_all(
             db: AsyncSession = Depends(self.get_db),
@@ -59,12 +66,52 @@ class RouterBase(
         ):
             return await self.crud.get_multi(
                 db=db,
+                skip=offset,
+                limit=limit,
                 filters=params.filters,
                 sort=params.sort,
                 fields=params.fields,
-                limit=limit,
-                offset=offset,
             )
+
+    def _register_getone_route(self):
+        @self.router.get("/{id}", response_model=self.response_schema)
+        async def get_one(id: Any, db: AsyncSession = Depends(self.get_db)):
+            item = await self.crud.get(db, id=id)
+            if not item:
+                raise HTTPException(status_code=404, detail="Item not found")
+            return item
+
+    def _register_create_route(self):
+        @self.router.post(
+            "/",
+            response_model=self.response_schema,
+            status_code=status.HTTP_201_CREATED,
+        )
+        async def create(
+            data: self.create_schema,  # type: ignore
+            db: AsyncSession = Depends(self.get_db),
+        ):
+            return await self.crud.create(db, obj_in=data)
+
+    def _register_update_route(self):
+        @self.router.patch("/{id}", response_model=self.response_schema)
+        async def update(
+            id: Any,
+            data: self.update_schema,  # type: ignore
+            db: AsyncSession = Depends(self.get_db),
+        ):
+            db_obj = await self.crud.get(db, id=id)
+            if not db_obj:
+                raise HTTPException(status_code=404, detail="Item not found")
+            return await self.crud.update(db, db_model=db_obj, obj_in=data)
+
+    def _register_delete_route(self):
+        @self.router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+        async def delete(id: Any, db: AsyncSession = Depends(self.get_db)):
+            success = await self.crud.remove(db, id=id)
+            if not success:
+                raise HTTPException(status_code=404, detail="Item not found")
+            return None
 
     async def get_router(self) -> APIRouter:
         return self.router
