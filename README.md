@@ -27,6 +27,25 @@ cd Anisodactyl
 pip install -e .[dev]
 ```
 
+#### Nice Test UI
+
+Adds colorful CLI progress bars, check icons and coloured diff on `pytest -vv`.
+Nice on eyes, fast and faithful to the original pytest interface. Very minimal.
+
+```sh
+pip install -e .[dev,nice]
+```
+
+#### Modern Test UI
+
+Go full bling with detailed breakdowns for a power user like setup. stdout and
+stderr, line numbers, code syntax highlighting, icons, error breakdowns etc.
+Highly verbose.
+
+```sh
+pip install -e .[dev,modern]
+```
+
 ## 👀 Vision
 
 A typical CRUD manipulates a database structure in this structure where each node is a table: `Parent? --- Current --< Children?`.

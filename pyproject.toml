@@ -23,18 +23,26 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# `pip install -e .[test]` to install package + dependencies + test
-test = [
-    "pytest",           # Standard testing framework
-    "pytest-asyncio",   # pytest async support
-    # "pytest-sugar",     # Colorful CLI progress bars for pytest
-    # "pytest-clarity",   # Coloured diff output pytest (-vv only)
-    # "pytest-pretty",    # Rich table of failures with line numbers (conflicts with progress bars)
-    "pytest-modern",    # Modern pytest UI - stdout/stderr, syntax highlighting, icons, error breakdowns etc.
-    "aiosqlite",        # Async SQLite
-    "httpx"             # HTTP client for routers
-]
-dev = [ "anisodactyl[test]" ]
+# ------------------------------- CORE PACKAGES -------------------------------
+    test = [
+        "pytest",           # Standard testing framework
+        "pytest-asyncio",   # pytest async support
+        "aiosqlite",        # Async SQLite
+        "httpx",            # HTTP client for routers
+    ]
+    dev = [ "anisodactyl[test]" ]
+# ------------------------------ EXTRA PACKAGES ------------------------------
+    nice = [
+        "pytest-sugar",     # Colorful progress bars
+        "pytest-clarity",   # Coloured diff (-vv only)
+        # "pytest-pretty",  # Table of failures (conflicts with progress bars)
+    ]
+    modern = [
+        # Modern pytest UI - stdout/stderr, syntax highlighting, icons, error
+        # breakdowns etc. Overrides `pytest-sugar` and `pytest-clarity`
+        "pytest-modern",
+    ]
+# ----------------------------------------------------------------------------
 
 [project.urls]
 Homepage = "https://github.com/MidHunterX/Anisodactyl"
