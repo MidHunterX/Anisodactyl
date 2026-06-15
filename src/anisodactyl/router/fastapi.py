@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any, Generic, List, Sequence, Type, TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from typing_extensions import Literal
 
@@ -70,12 +70,12 @@ class RouterBase(
         async def get_all(
             db: SessionT = Depends(self.get_db),
             params: QueryParserProtocol = Depends(self.query_parser),
-            limit: int = 100,
-            offset: int = 0,
+            limit: int = Query(default=10, le=100),
+            page: int = Query(default=1, ge=1),
         ) -> Sequence[ModelT]:
             return await self.crud.get_multi(
                 db=db,
-                skip=offset,
+                skip=(page - 1) * limit,
                 limit=limit,
                 filters=params.filters,
                 sort=params.sort,
