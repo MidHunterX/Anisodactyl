@@ -46,14 +46,14 @@ Nice on eyes, fast and faithful to the original pytest interface. Very minimal.
 pip install -e .[dev,nice]
 ```
 
-#### Modern Test UI
+#### Fancy Test UI
 
 Go full bling with detailed breakdowns for a power user like setup. stdout and
 stderr, line numbers, code syntax highlighting, icons, error breakdowns etc.
-Highly verbose.
+Highly verbose, useful and a bit overwhelming for passing tests.
 
 ```sh
-pip install -e .[dev,modern]
+pip install -e .[dev,fancy]
 ```
 
 ## 👀 Vision

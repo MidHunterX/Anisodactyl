@@ -37,7 +37,7 @@ dependencies = [
         "pytest-clarity",   # Coloured diff (-vv only)
         # "pytest-pretty",  # Table of failures (conflicts with progress bars)
     ]
-    modern = [
+    fancy = [
         # Modern pytest UI - stdout/stderr, syntax highlighting, icons, error
         # breakdowns etc. Overrides `pytest-sugar` and `pytest-clarity`
         "pytest-modern",
