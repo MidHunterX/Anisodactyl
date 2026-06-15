@@ -16,10 +16,10 @@
 
 This tries to solve the following problems:
 
-- Headless CRUD Wrapper
-- Automatic CRUD API Endpoints
-- URL based Sorting and Filtering - Every possible sorting and filtering available via URL.
-- Nested Database Mutations - Eliminate N+1 network requests.
+- [x] Headless CRUD Wrapper
+- [x] Automatic CRUD API Endpoints
+- [x] URL based Sorting and Filtering - sorting and filtering available to all top-level objects via URL.
+- [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
 ## 🚀 Quick Start
 
