@@ -1,10 +1,11 @@
 import pytest
 import pytest_asyncio
-from conftest import CreateSchema, Model, UpdateSchema, ResponseSchema
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
-from anisodactyl import CRUDBase, RouterBase
+from anisodactyl.crud.sqlalchemy import CRUDBase
+from anisodactyl.router.fastapi import RouterBase
+from tests.mocks import CreateSchema, Model, ResponseSchema, UpdateSchema
 
 
 @pytest.mark.asyncio
@@ -103,7 +104,9 @@ class TestRouterBase:
         assert response.json()["name"] == "Find Me"
 
     async def test_router_update(self, client: AsyncClient):
-        res = await client.post("/items/", json={"name": "OG", "description": "Keep Me"})
+        res = await client.post(
+            "/items/", json={"name": "OG", "description": "Keep Me"}
+        )
         id = res.json()["id"]
         # Update
         response = await client.patch(f"/items/{id}", json={"name": "Updated"})

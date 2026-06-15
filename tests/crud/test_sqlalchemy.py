@@ -1,8 +1,8 @@
 import pytest
-from conftest import CreateSchema, Model, UpdateSchema
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from anisodactyl import CRUDBase
+from anisodactyl.crud.sqlalchemy import CRUDBase
+from tests.mocks import CreateSchema, Model, UpdateSchema
 
 
 @pytest.mark.asyncio
