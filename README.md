@@ -1,4 +1,14 @@
-![A horizontal tech-noir banner for the 'Anisodactyl' library. The design features a dark, textured background composed of a grid of muted grey symbols that resemble futuristic or alien hieroglyphics. At the center, two large, minimalist white icons depict an artistic representation of anisodactyl bird footprints. A metaphorical nod to 'Crow’s Foot' database notation, where the hallux represents a parent table and the forward digits represent child relations. Below the icons, the word 'Anisodactyl' is rendered in a custom, geometric 'Modern Hieroglyphic' script, bridging the gap between ancient record-keeping and modern relational database architecture](./.assets/anisodactyl.jpg)
+![
+  A horizontal tech-noir banner for the 'Anisodactyl' library. The design
+  features a dark, textured background composed of a grid of muted grey symbols
+  that resemble futuristic or alien hieroglyphics. At the center, two large,
+  minimalist white icons depict an artistic representation of anisodactyl bird
+  footprints. A metaphorical nod to 'Crow’s Foot' database notation, where the
+  hallux represents a parent table and the forward digits represent child
+  relations. Below the icons, the word 'Anisodactyl' is rendered in a custom,
+  geometric 'Modern Hieroglyphic' script, bridging the gap between ancient
+  record-keeping and modern relational database architecture
+](./.assets/anisodactyl.jpg)
 
 # Anisodactyl
 
@@ -6,10 +16,10 @@
 
 This tries to solve the following problems:
 
-- Nested Database Mutations - Eliminate N+1 network requests.
-- URL based Sorting and Filtering - Every possible sorting and filtering available via URL.
-- Headless CRUD Engine
+- Headless CRUD Wrapper
 - Automatic CRUD API Endpoints
+- URL based Sorting and Filtering - Every possible sorting and filtering available via URL.
+- Nested Database Mutations - Eliminate N+1 network requests.
 
 ## 🚀 Quick Start
 
@@ -48,8 +58,13 @@ pip install -e .[dev,modern]
 
 ## 👀 Vision
 
-A typical CRUD manipulates a database structure in this structure where each node is a table: `Parent? --- Current --< Children?`.
-Every table in your interconnected database sits at the center of it's own relationship graph; optional `Parent` pointing inwards and optional `Children` pointing outwards.
+A typical CRUD interfaces db structure in a way where each table is a node:
+
+`Parent? --- Current --< Children?`
+
+Every table in your interconnected database sits at the center of it's own
+relationship graph; optional `Parent` pointing inwards and optional `Children`
+pointing outwards.
 
 ```mermaid
 graph TD
@@ -98,17 +113,17 @@ Current object can be anything. It can be one of the children as well, being abl
 #### [JSON API](https://jsonapi.org/format/#query-parameters)
 
 ```c
-// ?filter[key][operator]=value&[key][operator]=value
-?filter%5Bkey%5D%5Boperator%5D=value&%5Bkey%5D%5Boperator%5D=value
+// ?filter[key_name][operator]=value&[key_name][operator]=value
+?filter%5Bkey_name%5D%5Boperator%5D=value&%5Bkey_name%5D%5Boperator%5D=value
 ```
 
 > but `[` and `]` gets encoded into `%5B` and `%5D` which makes URLs ugly and unreadable.
 
-#### [Django REST Framework](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter), [django-url-filter](https://github.com/miki725/django-url-filter)
+#### [Django REST Framework](https://www.django-rest-framework.org/api-guide/filtering/#orderingfilter)
 
 ```js
 // ?post_tag=fiction&comment_count__gt=10
-?key__operator=value&key__operator=value
+?key_name__operator=value&key_name__operator=value
 ```
 
 > The python standard due to Django influence.
@@ -117,7 +132,7 @@ Current object can be anything. It can be one of the children as well, being abl
 
 ```js
 // ?post_tag=fiction&comment_count=gt:10
-?key=operator:value&key=operator:value
+?key_name=operator:value&key_name=operator:value
 // ?fields=name,email
 ?fields=key1,key2,key3
 // ?sort=-name

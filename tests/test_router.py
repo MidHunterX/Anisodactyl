@@ -1,6 +1,6 @@
 import pytest
 import pytest_asyncio
-from conftest import CreateSchema, Model, UpdateSchema
+from conftest import CreateSchema, Model, UpdateSchema, ResponseSchema
 from fastapi import FastAPI
 from httpx import ASGITransport, AsyncClient
 
@@ -21,7 +21,7 @@ class TestRouterBase:
             crud=crud,
             create_schema=CreateSchema,
             update_schema=UpdateSchema,
-            response_schema=CreateSchema,
+            response_schema=ResponseSchema,
             get_db=override_get_db,
             prefix="/items",
             tags=["test"],
@@ -37,97 +37,7 @@ class TestRouterBase:
         ) as ac:
             yield ac
 
-    # =========================== [ HAPPY PATH ] =========================== #
-
-    # GENERAL FEATURES
-    # ----------------
-
-    async def test_router_create(self, client: AsyncClient):
-        response = await client.post(
-            "/items/", json={"name": "Router Item", "description": "Route test"}
-        )
-        assert response.status_code == 201
-        assert response.json()["name"] == "Router Item"
-
-    async def test_router_get_all(self, client: AsyncClient, db_session):
-        # Seed data
-        crud = CRUDBase(Model)
-        await crud.create(db_session, obj_in=CreateSchema(name="Item A"))
-        await crud.create(db_session, obj_in=CreateSchema(name="Item B"))
-
-        response = await client.get("/items/")
-        assert response.status_code == 200
-        assert len(response.json()) == 2
-
-    async def test_router_filtering(self, client: AsyncClient, db_session):
-        # Seed data
-        crud = CRUDBase(Model)
-        await crud.create(db_session, obj_in=CreateSchema(name="Target"))
-        await crud.create(db_session, obj_in=CreateSchema(name="Other"))
-
-        # Test filter
-        response = await client.get("/items/?name=Target")
-        data = response.json()
-        assert len(data) == 1
-        assert data[0]["name"] == "Target"
-
-    async def test_router_get_one(self, client: AsyncClient, db_session):
-        crud = CRUDBase(Model)
-        obj = await crud.create(db_session, obj_in=CreateSchema(name="Find Me"))
-
-        response = await client.get(f"/items/{obj.id}")
-        assert response.status_code == 200
-        assert response.json()["name"] == "Find Me"
-
-    async def test_router_update(self, client: AsyncClient, db_session):
-        crud = CRUDBase(Model)
-        obj = await crud.create(
-            db_session, obj_in=CreateSchema(name="Original", description="Keep Me")
-        )
-        response = await client.patch(f"/items/{obj.id}", json={"name": "Updated"})
-        data = response.json()
-        assert data["name"] == "Updated"
-        assert data["description"] == "Keep Me"
-
-    async def test_router_delete(self, client: AsyncClient, db_session):
-        crud = CRUDBase(Model)
-        obj = await crud.create(db_session, obj_in=CreateSchema(name="Bye Bye"))
-
-        response = await client.delete(f"/items/{obj.id}")
-        assert response.status_code == 204
-
-        # Verify gone
-        check = await client.get(f"/items/{obj.id}")
-        assert check.status_code == 404
-
-    async def test_router_pagination(self, client: AsyncClient, db_session):
-        # Seed 5 items
-        crud = CRUDBase(Model)
-        for i in range(5):
-            await crud.create(db_session, obj_in=CreateSchema(name=f"Item {i}"))
-
-        # Test limit
-        response = await client.get("/items/?limit=2")
-        assert len(response.json()) == 2
-
-    async def test_router_pagination_valid(self, client: AsyncClient):
-        # standard allowed limit
-        response = await client.get("/items/?limit=50")
-        assert response.status_code == 200
-
-    async def test_router_pagination_offset(self, client: AsyncClient, db_session):
-        crud = CRUDBase(Model)
-        for i in range(3):
-            await crud.create(db_session, obj_in=CreateSchema(name=f"Item {i}"))
-
-        # Skip the first 2, should only return the 3rd
-        response = await client.get("/items/?limit=2&page=2")
-        data = response.json()
-        assert len(data) == 1
-        assert data[0]["name"] == "Item 2"
-
-    # CUSTOM FEATURES
-    # ---------------
+    # =========================== CUSTOM FEATURES =========================== #
 
     async def test_route_exclusion(self, override_get_db):
         """Verify that excluded routes return 405 or 404."""
@@ -149,19 +59,91 @@ class TestRouterBase:
 
         async with AsyncClient(
             transport=ASGITransport(app=app), base_url="http://test"
-        ) as ac:
+        ) as client:
             # Create should fail
-            res_post = await ac.post("/restricted/", json={"name": "fail"})
+            res_post = await client.post("/restricted/", json={"name": "fail"})
             assert res_post.status_code == 405  # Method Not Allowed
 
             # Get all should still work
-            res_get = await ac.get("/restricted/")
+            res_get = await client.get("/restricted/")
             assert res_get.status_code == 200
 
-    # ========================== [ UNHAPPY PATH ] ========================== #
+    # =========================== [ HAPPY PATH ] =========================== #
 
-    # GENERAL FEATURES
-    # ----------------
+    async def test_router_create(self, client: AsyncClient):
+        response = await client.post(
+            "/items/", json={"name": "Router Item", "description": "Route test"}
+        )
+        assert response.status_code == 201
+        assert response.json()["name"] == "Router Item"
+
+    async def test_router_get_all(self, client: AsyncClient):
+        for i in range(2):
+            await client.post("/items/", json={"name": f"Item {i}"})
+        # Get All
+        response = await client.get("/items/")
+        assert response.status_code == 200
+        assert len(response.json()) == 2
+
+    async def test_router_filtering(self, client: AsyncClient):
+        for name in ["Target", "Other"]:
+            await client.post("/items/", json={"name": name})
+        # Filter
+        response = await client.get("/items/?name=Target")
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["name"] == "Target"
+
+    async def test_router_get_one(self, client: AsyncClient):
+        res = await client.post("/items/", json={"name": "Find Me"})
+        id = res.json()["id"]
+        # Get One
+        response = await client.get(f"/items/{id}")
+        assert response.status_code == 200
+        assert response.json()["name"] == "Find Me"
+
+    async def test_router_update(self, client: AsyncClient):
+        res = await client.post("/items/", json={"name": "OG", "description": "Keep Me"})
+        id = res.json()["id"]
+        # Update
+        response = await client.patch(f"/items/{id}", json={"name": "Updated"})
+        data = response.json()
+        assert data["name"] == "Updated"
+        assert data["description"] == "Keep Me"
+
+    async def test_router_delete(self, client: AsyncClient):
+        res = await client.post("/items/", json={"name": "Bye Bye"})
+        id = res.json()["id"]
+        # Delete
+        response = await client.delete(f"/items/{id}")
+        assert response.status_code == 204, response
+        # Verify gone
+        check = await client.get(f"/items/{id}")
+        assert check.status_code == 404
+
+    async def test_router_pagination(self, client: AsyncClient):
+        # Seed 5 items
+        for i in range(5):
+            await client.post("/items/", json={"name": f"Item {i}"})
+        # Test limit
+        response = await client.get("/items/?limit=2")
+        assert len(response.json()) == 2
+
+    async def test_router_pagination_valid(self, client: AsyncClient):
+        # standard allowed limit
+        response = await client.get("/items/?limit=50")
+        assert response.status_code == 200
+
+    async def test_router_pagination_offset(self, client: AsyncClient):
+        for i in range(3):
+            await client.post("/items/", json={"name": f"Item {i}"})
+        # Skip the first 2, should only return the 3rd
+        response = await client.get("/items/?limit=2&page=2")
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["name"] == "Item 2"
+
+    # ========================== [ UNHAPPY PATH ] ========================== #
 
     async def test_get_one_not_found(self, client: AsyncClient):
         response = await client.get("/items/9999")
