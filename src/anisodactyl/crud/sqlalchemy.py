@@ -20,15 +20,29 @@ class CRUDBase(
         self.model = model
 
         self._operators: Dict[str, Callable[[Any, Any], ColumnElement]] = {
+            # Numeric / Basic
             "eq": lambda field, val: field == val,
             "ne": lambda field, val: field != val,
             "gt": lambda field, val: field > val,
             "lt": lambda field, val: field < val,
             "gte": lambda field, val: field >= val,
             "lte": lambda field, val: field <= val,
+            # String Pattern Matching
+            # ilike by default as urls are case insensitive
             "contains": lambda field, val: field.ilike(f"%{val}%"),
             "startswith": lambda field, val: field.ilike(f"{val}%"),
             "endswith": lambda field, val: field.ilike(f"%{val}"),
+            "like": lambda field, val: field.ilike(val),
+            # List
+            # might attack with ?status=in:active,pending,hidden_status overriding API logic
+            # "in": lambda field, val: field.in_(val if isinstance(val, list) else [val]),
+            # "nin": lambda field, val: ~field.in_(val if isinstance(val, list) else [val]),
+            # Null check
+            # No need for frontend to do null checks. Should be done by backend
+            # "isnull": lambda field, val: field.is_(None) if str(val).lower() != "false" else field.is_not(None),
+            # "notnull": lambda field, val: field.is_not(None) if str(val).lower() != "false" else field.is_(None),
+            # Ranges
+            "between": lambda field, val: field.between(val[0], val[1]) if isinstance(val, list) and len(val) == 2 else field == val,
         }
 
     async def get(self, db, **kwargs):
@@ -62,6 +76,12 @@ class CRUDBase(
                 operator = f["op"]
                 value = f["value"]
                 if field is not None and operator in self._operators:
+                    # Handle between operator
+                    if operator == "between":
+                        if isinstance(value, str) and "," in value:
+                            value = value.split(",", 1)
+                        if not isinstance(value, (list, tuple)) or len(value) != 2:
+                            continue
                     query = query.where(self._operators[operator](field, value))
 
         if sort:

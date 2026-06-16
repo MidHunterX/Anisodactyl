@@ -14,6 +14,8 @@ ALLOWED_OPS = {
     "contains",
     "startswith",
     "endswith",
+    "like",
+    "between",
 }
 
 QuerySourceT = TypeVar("QuerySourceT", contravariant=True)  # Request, dict ...
