@@ -21,6 +21,8 @@ This tries to solve the following problems:
 - [x] Schema Driven URL Sorting and Filtering - URL based sorting and filtering automatically available to all properties listed in schema.
 - [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
+![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
+
 ## 🚀 Quick Start
 
 ### Installation
@@ -55,6 +57,8 @@ Highly verbose, useful and a bit overwhelming for passing tests.
 ```sh
 pip install -e .[dev,fancy]
 ```
+
+![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
 
 ## 👀 Vision
 
@@ -105,6 +109,8 @@ c1 & c2 & c3 === s === p
 > The diagram above forms the shape of an anisodactyl "[crow foot](https://en.wikipedia.org/wiki/Entity–relationship_model#Crow's_foot_notation)" - digits (children), hallux (parent), connected through the central tarsometatarsus self.
 
 Current object can be anything. It can be one of the children as well, being able to create any graph like structure imaginable.
+
+![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
 
 ## 📚 Notes
 
