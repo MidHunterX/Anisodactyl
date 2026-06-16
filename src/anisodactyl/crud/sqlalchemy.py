@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict, Optional, Sequence, TypeVar
 
 from pydantic import BaseModel
-from sqlalchemy import ColumnElement, select
+from sqlalchemy import ColumnElement, select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import DeclarativeBase, load_only
 
@@ -55,7 +55,7 @@ class CRUDBase(
 
     async def get_multi(
         self, db, skip=0, limit=100, filters=None, sort=None, fields=None, **kwargs
-    ) -> Sequence[ModelType]:
+    ) -> tuple[Sequence[ModelType], int]:
         """
         Backend Usage: `crud.get_multi(db, email="test@test.com")`
         JSON Usage: `crud.get_multi(db, filters=[{"field": "email", "op": "eq", "value": "test@test.com"}])`
@@ -103,9 +103,14 @@ class CRUDBase(
         if kwargs:
             query = query.filter_by(**kwargs)
 
+        # Pagination Count
+        count_query = select(func.count()).select_from(query.subquery())
+        total_result = await db.execute(count_query)
+        total_count = total_result.scalar_one()
+
         query = query.offset(skip).limit(limit)
         result = await db.execute(query)
-        return result.scalars().all()
+        return result.scalars().all(), total_count
 
     async def create(self, db, *, obj_in, auto_commit=True) -> ModelType:
         obj_data = obj_in.model_dump()

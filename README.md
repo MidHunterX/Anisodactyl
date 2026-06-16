@@ -16,9 +16,9 @@
 
 This tries to solve the following problems:
 
-- [x] Headless CRUD Wrapper
-- [x] Automatic CRUD API Endpoints
-- [x] URL based Sorting and Filtering - sorting and filtering available to all top-level objects via URL.
+- [x] Headless CRUD Wrapper - Programmatic and configurable CRUD system for models.
+- [x] Automatic CRUD API Endpoints - Create, Get, Get All, Patch Update and Delete REST API Endpoints for any database table.
+- [x] Schema Driven URL Sorting and Filtering - URL based sorting and filtering automatically available to all properties listed in schema.
 - [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
 ## 🚀 Quick Start

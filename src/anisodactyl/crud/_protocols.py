@@ -34,7 +34,7 @@ class CRUDProtocol(
         sort: Optional[list[str]] = None,
         fields: Optional[list[str]] = None,
         **kwargs,
-    ) -> Sequence[ModelType]: ...
+    ) -> tuple[Sequence[ModelType], int]: ...
 
     async def create(
         self,

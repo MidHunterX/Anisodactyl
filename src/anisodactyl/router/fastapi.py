@@ -1,13 +1,15 @@
+import math
 from enum import Enum
 from typing import Any, Generic, List, Sequence, Type, TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from typing_extensions import Literal
 
 from anisodactyl.crud._protocols import CRUDProtocol
 from anisodactyl.query._protocols import QueryParserProtocol
 from anisodactyl.query.anisodactyl import QueryParams  # Default Query Parser
+from ._protocols import PaginatedResponse
 
 SessionT = TypeVar("SessionT", contravariant=True)
 ModelT = TypeVar("ModelT")
@@ -66,14 +68,14 @@ class RouterBase(
             self._register_delete_route()
 
     def _register_getall_route(self):
-        @self.router.get("/", response_model=List[self.response_schema])
+        @self.router.get("/", response_model=PaginatedResponse[self.response_schema])
         async def get_all(
             db: SessionT = Depends(self.get_db),
             params: QueryParserProtocol = Depends(self.query_parser),
             limit: int = Query(default=10, le=100),
             page: int = Query(default=1, ge=1),
-        ) -> Sequence[ModelT]:
-            return await self.crud.get_multi(
+        ):
+            items, total_count = await self.crud.get_multi(
                 db=db,
                 skip=(page - 1) * limit,
                 limit=limit,
@@ -81,6 +83,16 @@ class RouterBase(
                 sort=params.sort,
                 fields=params.fields,
             )
+            pages = math.ceil(total_count / limit) if total_count > 0 else 0
+            return {
+                "data": items,
+                "pagination": {
+                    "total": total_count,
+                    "page": page,
+                    "limit": limit,
+                    "pages": pages,
+                },
+            }
 
     def _register_getone_route(self):
         @self.router.get("/{id}", response_model=self.response_schema)
