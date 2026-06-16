@@ -26,24 +26,15 @@ class TestCRUDBase:
 
     async def test_transaction_pass(self, db_session: AsyncSession, crud: CRUDBase):
         async with db_session.begin():
-            await crud.create(
-                db_session,
-                obj_in=CreateSchema(name="Test Item"),
-                auto_commit=False,
-            )
-            await crud.create(
-                db_session,
-                obj_in=CreateSchema(name="Test Item 2"),
-                auto_commit=False,
-            )
-            await crud.create(
-                db_session,
-                obj_in=CreateSchema(name="Test Item 3"),
-                auto_commit=False,
-            )
-
-        objs = await crud.get_multi(db_session)
-        assert len(objs) == 3
+            for i in range(3):
+                await crud.create(
+                    db_session,
+                    obj_in=CreateSchema(name=f"Item {i}"),
+                    auto_commit=False,
+                )
+        items, count = await crud.get_multi(db_session)
+        assert count == 3
+        assert len(items) == 3
 
     async def test_transaction_fail(self, db_session: AsyncSession, crud: CRUDBase):
         with pytest.raises(Exception):
@@ -61,8 +52,9 @@ class TestCRUDBase:
                 )
                 raise Exception
 
-        objs = await crud.get_multi(db_session)
-        assert len(objs) == 0
+        items, count = await crud.get_multi(db_session)
+        assert count == 0
+        assert len(items) == 0
 
     async def test_get(self, db_session, crud: CRUDBase):
         # Create an object first
@@ -88,15 +80,16 @@ class TestCRUDBase:
         await crud.create(db_session, obj_in=CreateSchema(name="Item 3"))
 
         # Test limit
-        objs = await crud.get_multi(db_session, skip=0, limit=2)
+        objs, count = await crud.get_multi(db_session, skip=0, limit=2)
+        assert count == 3
         assert len(objs) == 2
 
         # Test skip
-        objs_skipped = await crud.get_multi(db_session, skip=2, limit=2)
-        assert len(objs_skipped) == 1
+        objs_remaining, _ = await crud.get_multi(db_session, skip=2, limit=2)
+        assert len(objs_remaining) == 1
 
         # Test filters
-        objs_filtered = await crud.get_multi(db_session, name="Item 2", id=2)
+        objs_filtered, _ = await crud.get_multi(db_session, name="Item 2", id=2)
         assert len(objs_filtered) == 1
 
     async def test_update_with_schema(self, db_session, crud: CRUDBase):
@@ -147,15 +140,17 @@ class TestCRUDBase:
         for k, v in dataset.items():
             await crud.create(db_session, obj_in=CreateSchema(name=k, description=v))
 
-        obj = await crud.get_multi(
+        items, total = await crud.get_multi(
             db_session,
             filters=[{"field": "description", "op": "eq", "value": "Fruit"}],
             sort=["-name"],
             fields=["name", "description"],
         )
 
+        # Verify pagination item count logic
+        assert total == 2
         # Verify filter
-        assert len(obj) == 2
+        assert len(items) == 2
         # Verify sort
-        assert obj[0].name == "Banana"
-        assert obj[1].name == "Apple"
+        assert items[0].name == "Banana"
+        assert items[1].name == "Apple"

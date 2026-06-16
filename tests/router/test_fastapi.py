@@ -84,14 +84,17 @@ class TestRouterBase:
         # Get All
         response = await client.get("/items/")
         assert response.status_code == 200
-        assert len(response.json()) == 2
+        json = response.json()
+        assert json["pagination"]["total"] == 2
+        assert len(json["data"]) == 2
 
     async def test_router_filtering(self, client: AsyncClient):
         for name in ["Target", "Other"]:
             await client.post("/items/", json={"name": name})
         # Filter
         response = await client.get("/items/?name=Target")
-        data = response.json()
+        json = response.json()
+        data = json["data"]
         assert len(data) == 1
         assert data[0]["name"] == "Target"
 
@@ -142,7 +145,8 @@ class TestRouterBase:
             await client.post("/items/", json={"name": f"Item {i}"})
         # Skip the first 2, should only return the 3rd
         response = await client.get("/items/?limit=2&page=2")
-        data = response.json()
+        json = response.json()
+        data = json["data"]
         assert len(data) == 1
         assert data[0]["name"] == "Item 2"
 
@@ -164,7 +168,9 @@ class TestRouterBase:
         # Ensure database is clean
         response = await client.get("/items/")
         assert response.status_code == 200
-        assert response.json() == []
+        json = response.json()
+        data = json["data"]
+        assert data == []
 
     async def test_router_pagination_exceeds_limit(self, client: AsyncClient):
         # INTENT: Big Query Attack
@@ -180,7 +186,9 @@ class TestRouterBase:
     async def test_router_pagination_out_of_bounds_page(self, client: AsyncClient):
         response = await client.get("/items/?limit=10&page=999")
         assert response.status_code == 200
-        assert response.json() == []
+        json = response.json()
+        data = json["data"]
+        assert data == []
 
     async def test_router_pagination_invalid_page(self, client: AsyncClient):
         response = await client.get("/items/?page=0")
