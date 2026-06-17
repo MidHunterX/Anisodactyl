@@ -40,7 +40,7 @@ class CRUDProtocol(
         self,
         db: SessionType,
         *,
-        obj_in: CreateSchemaType,
+        obj_in: CreateSchemaType | JSONType,
         auto_commit: bool = True,
     ) -> ModelType: ...
 

@@ -113,7 +113,10 @@ class CRUDBase(
         return result.scalars().all(), total_count
 
     async def create(self, db, *, obj_in, auto_commit=True) -> ModelType:
-        obj_data = obj_in.model_dump()
+        if isinstance(obj_in, dict):
+            obj_data = obj_in
+        else:
+            obj_data = obj_in.model_dump()
         db_obj = self.model(**obj_data)
         return await self._save(db, db_obj, auto_commit)
 
