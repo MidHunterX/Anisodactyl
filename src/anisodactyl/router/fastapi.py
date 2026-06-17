@@ -1,6 +1,6 @@
 import math
 from enum import Enum
-from typing import Any, Generic, List, Sequence, Type, TypeVar
+from typing import Any, Generic, List, Type, TypeVar
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
@@ -93,6 +93,7 @@ class RouterBase(
                     "pages": pages,
                 },
             }
+        _ = get_all  # to suppress unused taggedHint
 
     def _register_getone_route(self):
         @self.router.get("/{id}", response_model=self.response_schema)
@@ -101,6 +102,7 @@ class RouterBase(
             if not item:
                 raise HTTPException(status_code=404, detail="Item not found")
             return item
+        _ = get_one  # to suppress unused taggedHint
 
     def _register_create_route(self):
         @self.router.post(
@@ -113,6 +115,7 @@ class RouterBase(
             db: SessionT = Depends(self.get_db),
         ) -> ModelT:
             return await self.crud.create(db, obj_in=data)
+        _ = create  # to suppress unused taggedHint
 
     def _register_update_route(self):
         @self.router.patch("/{id}", response_model=self.response_schema)
@@ -125,6 +128,7 @@ class RouterBase(
             if not db_obj:
                 raise HTTPException(status_code=404, detail="Item not found")
             return await self.crud.update(db, db_model=db_obj, obj_in=data)
+        _ = update  # to suppress unused taggedHint
 
     def _register_delete_route(self):
         @self.router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -133,6 +137,7 @@ class RouterBase(
             if not success:
                 raise HTTPException(status_code=404, detail="Item not found")
             return None
+        _ = delete  # to suppress unused taggedHint
 
     async def get_router(self) -> APIRouter:
         return self.router
