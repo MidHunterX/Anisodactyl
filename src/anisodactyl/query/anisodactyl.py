@@ -6,9 +6,16 @@ from anisodactyl.query._protocols import ALLOWED_OPS, QueryParserProtocol
 class QueryParams(QueryParserProtocol):
     """
     Anisodactyl URL spec:
-    ?key=operator:value -> filters[{"field": key, "op": operator, "value": value}]
-    ?sort=-key,key      -> sort[key, -key]
-    ?fields=a,b,c       -> fields[a, b, c]
+
+    Filters:
+    ?key=operator:value
+    ?key=value
+
+    Sorting:
+    ?sort=-key,key
+
+    Fields:
+    ?fields=a,b,c
     """
 
     def __init__(self, request: Request):
