@@ -9,6 +9,7 @@ from typing_extensions import Literal
 from anisodactyl.crud._protocols import CRUDProtocol
 from anisodactyl.query._protocols import QueryParserProtocol
 from anisodactyl.query.anisodactyl import QueryParams  # Default Query Parser
+
 from ._protocols import PaginatedResponse
 
 SessionT = TypeVar("SessionT", contravariant=True)
@@ -87,12 +88,13 @@ class RouterBase(
             return {
                 "data": items,
                 "pagination": {
-                    "total": total_count,
-                    "page": page,
-                    "limit": limit,
-                    "pages": pages,
+                    "limit": limit,  # Items per page
+                    "total": total_count,  # Total number of items
+                    "page": page,  # Current page
+                    "pages": pages,  # Total number of pages
                 },
             }
+
         _ = get_all  # to suppress unused taggedHint
 
     def _register_getone_route(self):
@@ -102,6 +104,7 @@ class RouterBase(
             if not item:
                 raise HTTPException(status_code=404, detail="Item not found")
             return item
+
         _ = get_one  # to suppress unused taggedHint
 
     def _register_create_route(self):
@@ -115,6 +118,7 @@ class RouterBase(
             db: SessionT = Depends(self.get_db),
         ) -> ModelT:
             return await self.crud.create(db, obj_in=data)
+
         _ = create  # to suppress unused taggedHint
 
     def _register_update_route(self):
@@ -128,6 +132,7 @@ class RouterBase(
             if not db_obj:
                 raise HTTPException(status_code=404, detail="Item not found")
             return await self.crud.update(db, db_model=db_obj, obj_in=data)
+
         _ = update  # to suppress unused taggedHint
 
     def _register_delete_route(self):
@@ -137,6 +142,7 @@ class RouterBase(
             if not success:
                 raise HTTPException(status_code=404, detail="Item not found")
             return None
+
         _ = delete  # to suppress unused taggedHint
 
     async def get_router(self) -> APIRouter:

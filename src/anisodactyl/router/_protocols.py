@@ -1,17 +1,17 @@
-from typing import Generic, TypeVar, Sequence
+from typing import Generic, Sequence, TypeVar
 
 from pydantic import BaseModel
 
-T = TypeVar("T")
+Items = TypeVar("Items")
 
 
 class PaginationInfo(BaseModel):
-    total: int
-    page: int
-    limit: int
-    pages: int
+    limit: int  # Items per page
+    total: int  # Total number of items
+    page: int  # Current page
+    pages: int  # Total number of pages
 
 
-class PaginatedResponse(BaseModel, Generic[T]):
-    data: Sequence[T]
+class PaginatedResponse(BaseModel, Generic[Items]):
+    data: Sequence[Items]
     pagination: PaginationInfo
