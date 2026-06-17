@@ -24,6 +24,14 @@ class TestCRUDBase:
         assert db_obj.name == "Test Item"
         assert db_obj.description == "Test Description"
 
+    async def test_create_with_dict(self, db_session, crud: CRUDBase):
+        obj_in = {"name": "Test Item", "description": "Test Description"}
+        db_obj = await crud.create(db_session, obj_in=obj_in)
+
+        assert db_obj.id is not None
+        assert db_obj.name == "Test Item"
+        assert db_obj.description == "Test Description"
+
     async def test_transaction_pass(self, db_session: AsyncSession, crud: CRUDBase):
         async with db_session.begin():
             for i in range(3):
