@@ -45,9 +45,41 @@ python -m readme_renderer README.md -o index.html
 
 ### Releasing
 
+Clear previous builds and build a new one
+
 ```
 rm -rf dist
 python -m build
+```
+
+Check the build
+
+```
 twine check dist/*
+```
+
+Upload to test PyPI first to catch any issues
+
+```
+twine upload --repository testpypi dist/*
+```
+
+Test install from test PyPI
+
+```
+pip uninstall anisodactyl
+pip install --index-url https://test.pypi.org/simple/ anisodactyl
+```
+
+If test works, upload to real PyPI
+
+```
 twine upload --repository pypi dist/*
+```
+
+Git Tag and Push
+
+```
+git tag -a v0.1.0 -m "Initial release with core CRUD functionality"
+git push origin v0.1.0
 ```

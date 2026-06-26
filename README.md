@@ -22,6 +22,12 @@ This tries to solve the following problems:
 - [x] Swappable URL Conventions - Pick and choose between different URL conventions.
 - [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
+### Installation
+
+```bash
+pip install anisodactyl
+```
+
 <br/>
 
 ![Anisodactyl Foot Prints](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl-track.png)
