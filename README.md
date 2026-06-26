@@ -10,6 +10,8 @@
   record-keeping and modern relational database architecture
 ](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl.jpg)
 
+[![PyPI version](https://badge.fury.io/py/anisodactyl.svg)](https://badge.fury.io/py/anisodactyl)
+
 # Anisodactyl
 
 > One CRUD to rule them all.
