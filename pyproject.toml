@@ -4,7 +4,7 @@
 
 [project]
 name = "anisodactyl"
-version = "0.0.1"
+version = "0.1.0"
 authors = [ { name="MidHunterX" } ]
 description = "One CRUD to rule them all"
 readme = "README.md"
@@ -30,7 +30,11 @@ dependencies = [
         "aiosqlite",        # Async SQLite
         "httpx",            # HTTP client for routers
     ]
-    dev = [ "anisodactyl[test]" ]
+    dev = [
+        "anisodactyl[test]",
+        "build",            # Build package with `python -m build`
+        "twine",            # Upload package with `python -m twine upload dist/*`
+    ]
 # ------------------------------ EXTRA PACKAGES ------------------------------
     nice = [
         "pytest-sugar",     # Colorful progress bars

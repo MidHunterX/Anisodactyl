@@ -8,7 +8,7 @@
   relations. Below the icons, the word 'Anisodactyl' is rendered in a custom,
   geometric 'Modern Hieroglyphic' script, bridging the gap between ancient
   record-keeping and modern relational database architecture
-](./.assets/anisodactyl.jpg)
+](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl.jpg)
 
 # Anisodactyl
 
@@ -19,46 +19,12 @@ This tries to solve the following problems:
 - [x] Headless CRUD Wrapper - Programmatic and configurable CRUD system for models.
 - [x] Automatic CRUD API Endpoints - Create, Get, Get All, Patch Update and Delete REST API Endpoints for any database table.
 - [x] Schema Driven URL Sorting and Filtering - URL based sorting and filtering automatically available to all properties listed in schema.
+- [x] Swappable URL Conventions - Pick and choose between different URL conventions.
 - [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
-![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
+<br/>
 
-## 🚀 Quick Start
-
-### Installation
-
-```sh
-pip install git+https://github.com/MidHunterX/Anisodactyl.git
-```
-
-### Development
-
-```sh
-git clone https://github.com/MidHunterX/Anisodactyl.git
-cd Anisodactyl
-pip install -e .[dev]
-```
-
-#### Nice Test UI
-
-Adds colorful CLI progress bars, check icons and coloured diff on `pytest -vv`.
-Nice on eyes, fast and faithful to the original pytest interface. Very minimal.
-
-```sh
-pip install -e .[dev,nice]
-```
-
-#### Fancy Test UI
-
-Go full bling with detailed breakdowns for a power user like setup. stdout and
-stderr, line numbers, code syntax highlighting, icons, error breakdowns etc.
-Highly verbose, useful and a bit overwhelming for passing tests.
-
-```sh
-pip install -e .[dev,fancy]
-```
-
-![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
+![Anisodactyl Foot Prints](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl-track.png)
 
 ## 👀 Vision
 
@@ -110,7 +76,9 @@ c1 & c2 & c3 === s === p
 
 Current object can be anything. It can be one of the children as well, being able to create any graph like structure imaginable.
 
-![Anisodactyl Foot Prints Horizontal Rule](./.assets/anisodactyl-track.png)
+<br/>
+
+![Anisodactyl Foot Prints](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl-track.png)
 
 ## 📚 Notes
 
@@ -147,17 +115,6 @@ Current object can be anything. It can be one of the children as well, being abl
 
 > Super clean, simple and developer centric.
 
-### Package Structure
-
-- [Official Packaging Docs](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
-
-Generate distribution archives
-
-```sh
-python -m pip install --upgrade build
-python -m build
-```
-
 <!--
 Fun fact
 My thought process when creating the banner were:
@@ -166,5 +123,12 @@ My thought process when creating the banner were:
 - The bird feet structure is known as Anisodactyl.
 - "Crow's Foot" notation is used for designing Database ER diagrams.
 - Birds are commonly used in ancient hieroglyphics but, database technologies are modern therefore the modern version of hieroglyphics is used as the whole aesthetic.
-- and anisodactyl is chosen for the CRUD automation library
+- The earliest known flying bird, Archaeopteryx, possessed anisodactyl feet.
+- meaning Anisodactyl is the primitive avian foot. So is hieroglyphic script which is a primitive language.
+- Anisodactyl can be seen as a pattern, just like the library; filled with patterns which can be reused.
+- thus anisodactyl was chosen for this CRUD pattern library
 -->
+
+<br/>
+
+![Anisodactyl Foot Prints](https://github.com/MidHunterX/Anisodactyl/raw/master/.assets/anisodactyl-track.png)
