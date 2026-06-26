@@ -1,12 +1,5 @@
-from fastapi import Request
-
 from anisodactyl.query.django import DjangoQueryParams
-
-
-def create_mock_request(query_string: str) -> Request:
-    """Helper to create a FastAPI request with specific query params."""
-    scope = {"type": "http", "query_string": query_string.encode()}
-    return Request(scope)
+from tests.mocks import create_mock_request
 
 
 class TestDjangoQueryParser:

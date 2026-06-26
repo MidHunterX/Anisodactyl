@@ -29,3 +29,15 @@ class ResponseSchema(BaseModel):
     id: int  # id exposed for testing purposes only
     name: str
     description: Optional[str]
+
+
+# ===============================[ API AREA ]=============================== #
+
+from fastapi import Request
+
+
+@staticmethod
+def create_mock_request(query_string: str) -> Request:
+    """Helper to create a FastAPI request with specific query params."""
+    scope = {"type": "http", "query_string": query_string.encode()}
+    return Request(scope)
