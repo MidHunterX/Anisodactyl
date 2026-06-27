@@ -1,14 +1,14 @@
 from typing import (Any, Optional, Protocol, Sequence, Type, TypeVar,
                     runtime_checkable)
 
-from pydantic import BaseModel  # Tightly coupled as it is the standard
 from typing_extensions import TypedDict
 
 SessionType = TypeVar("SessionType", contravariant=True)
 ModelType = TypeVar("ModelType")
-CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel, contravariant=True)
-UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel, contravariant=True)
+
 JSONType = dict[str, Any]
+CreateSchemaType = TypeVar("CreateSchemaType", contravariant=True)
+UpdateSchemaType = TypeVar("UpdateSchemaType", contravariant=True)
 
 
 class FilterDict(TypedDict):
@@ -21,7 +21,12 @@ class FilterDict(TypedDict):
 class CRUDProtocol(
     Protocol[ModelType, CreateSchemaType, UpdateSchemaType, SessionType]
 ):
-    def __init__(self, model: Type[ModelType]): ...
+    def __init__(
+        self,
+        model: Type[ModelType],
+        *,
+        child_models: Optional[dict[str, Type]] = None,
+    ): ...
 
     async def get(self, db: SessionType, **kwargs) -> Optional[ModelType]: ...
 
