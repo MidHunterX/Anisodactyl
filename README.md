@@ -22,7 +22,7 @@ This tries to solve the following problems:
 - [x] Automatic CRUD API Endpoints - Create, Get, Get All, Patch Update and Delete REST API Endpoints for any database table.
 - [x] Schema Driven URL Sorting and Filtering - URL based sorting and filtering automatically available to all properties listed in schema.
 - [x] Swappable URL Conventions - Pick and choose between different URL conventions.
-- [ ] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
+- [x] Nested Database Mutations - Generic CRUD for nested databases. Eliminate N+1 network requests.
 
 ### Installation
 
