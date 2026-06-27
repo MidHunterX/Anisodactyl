@@ -2,7 +2,8 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from anisodactyl.crud.sqlalchemy import CRUDBase
-from tests.mocks import CreateSchema, Model, UpdateSchema
+from tests.app.models import Model
+from tests.app.schemas import CreateSchema, UpdateSchema
 
 
 @pytest.mark.asyncio

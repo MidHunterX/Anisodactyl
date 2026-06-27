@@ -1,5 +1,5 @@
 from anisodactyl.query.anisodactyl import QueryParams
-from tests.mocks import create_mock_request
+from tests.app.routes import create_mock_request
 
 
 class TestQueryParser:

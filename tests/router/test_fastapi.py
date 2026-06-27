@@ -5,7 +5,8 @@ from httpx import ASGITransport, AsyncClient
 
 from anisodactyl.crud.sqlalchemy import CRUDBase
 from anisodactyl.router.fastapi import RouterBase
-from tests.mocks import CreateSchema, Model, ResponseSchema, UpdateSchema
+from tests.app.models import Model
+from tests.app.schemas import CreateSchema, ResponseSchema, UpdateSchema
 
 
 @pytest.mark.asyncio

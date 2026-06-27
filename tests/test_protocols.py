@@ -3,7 +3,8 @@ from anisodactyl.crud.sqlalchemy import CRUDBase
 from anisodactyl.query._protocols import QueryParserProtocol
 from anisodactyl.query.anisodactyl import QueryParams
 from anisodactyl.query.django import DjangoQueryParams
-from tests.mocks import Model, create_mock_request
+from tests.app.models import Model
+from tests.app.routes import create_mock_request
 
 
 class TestProtocolConformance:
