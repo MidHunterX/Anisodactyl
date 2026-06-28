@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Optional, Sequence, TypeVar
+from typing import Any, Callable, Dict, Sequence, Type, TypeVar
 
 from pydantic import BaseModel
 from sqlalchemy import ColumnElement, func, select
@@ -20,7 +20,7 @@ class CRUDBase(
         self,
         model,
         *,
-        child_models=None,
+        child_models: dict[str, Type[DeclarativeBase]] | None = None,
     ):
         self.model = model
         self.child_models = child_models or {}
@@ -140,7 +140,7 @@ class CRUDBase(
         obj_data = obj_in.copy() if isinstance(obj_in, dict) else obj_in.model_dump()
 
         # EXTRACT: Children
-        child_data = {}
+        child_data: dict[str, Any] = {}
         for rel_name in self.child_models:
             if rel_name in obj_data:
                 child_data[rel_name] = obj_data.pop(rel_name)
@@ -180,7 +180,7 @@ class CRUDBase(
             update_data = obj_in.model_dump(exclude_unset=True)
 
         # EXTRACT: Children
-        child_data = {}
+        child_data: dict[str, Any] = {}
         for rel_name in self.child_models:
             if rel_name in update_data:
                 child_data[rel_name] = update_data.pop(rel_name)
@@ -252,7 +252,7 @@ class CRUDBase(
 
         return await self._save(db, db_model, auto_commit)
 
-    async def remove(self, db, *, auto_commit=True, **kwargs) -> Optional[ModelType]:
+    async def remove(self, db, *, auto_commit=True, **kwargs) -> ModelType | None:
         """Usage: `crud.remove(db, id=1)` OR `crud.remove(db, email="test@test.com")`"""
         query = select(self.model).filter_by(**kwargs)
         result = await db.execute(query)

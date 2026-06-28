@@ -5,6 +5,7 @@ from typing_extensions import TypedDict
 
 SessionType = TypeVar("SessionType", contravariant=True)
 ModelType = TypeVar("ModelType")
+ChildModelType = type[Any] # Tell via LSP that it's supposed to be a child and not just any
 
 JSONType = dict[str, Any]
 CreateSchemaType = TypeVar("CreateSchemaType", contravariant=True)
@@ -25,7 +26,9 @@ class CRUDProtocol(
         self,
         model: Type[ModelType],
         *,
-        child_models: Optional[dict[str, Type]] = None,
+        # NOTE: Make sure to narrow down type of child_models with ORM class on
+        # implementation for LSP autocompletion when developing
+        child_models: Optional[dict[str, ChildModelType]] = None,
     ): ...
 
     async def get(self, db: SessionType, **kwargs) -> Optional[ModelType]: ...
